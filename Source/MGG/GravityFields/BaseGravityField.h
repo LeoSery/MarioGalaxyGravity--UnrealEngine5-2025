@@ -23,6 +23,9 @@ public:
 	ABaseGravityField();
     
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void PostEditMove(bool bFinished) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	
 	virtual void DrawDebugGravityField() PURE_VIRTUAL(ABaseGravityField::DrawDebugGravityField,);
 	virtual void ApplyGravity() PURE_VIRTUAL(ABaseGravityField::ApplyGravity,);
@@ -30,8 +33,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bShowDebugField = true;
 
+	static TArray<ABaseGravityField*> AllGravityFields;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	void RedrawDebugField();
 
 	UPROPERTY(EditAnywhere, Category = "Gravity")
 	float GravityStrength;
