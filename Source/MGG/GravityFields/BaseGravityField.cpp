@@ -1,6 +1,6 @@
 ﻿#include "BaseGravityField.h"
 
-TArray<ABaseGravityField*> ABaseGravityField::AllGravityFields;
+#include "Components/LineBatchComponent.h"
 
 ABaseGravityField::ABaseGravityField()
 {
@@ -9,12 +9,15 @@ ABaseGravityField::ABaseGravityField()
 	GravityStrength = 9.81f;
 	GravityFieldPriority = 0;
 	GravityType = NONE;
+	
+	DebugLines = CreateDefaultSubobject<ULineBatchComponent>(TEXT("DebugLines"));
 }
 
 void ABaseGravityField::BeginPlay()
 {
 	Super::BeginPlay();
-	AllGravityFields.Add(this);
+	
+	currentDrawer = MakeUnique<GravityFieldDrawer>(DebugLines);
 	
 	if(bShowDebugField)
 	{
@@ -22,26 +25,12 @@ void ABaseGravityField::BeginPlay()
 	}
 }
 
-void ABaseGravityField::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-	AllGravityFields.Remove(this);
-}
-
 void ABaseGravityField::RedrawDebugField()
 {
-	if (bShowDebugField && GetWorld())
+	if (bShowDebugField && DebugLines)
 	{
-		FlushPersistentDebugLines(GetWorld());
-		FlushPersistentDebugLines(GetWorld());
-		
-		for (ABaseGravityField* Field : AllGravityFields)
-		{
-			if (Field && Field->bShowDebugField)
-			{
-				Field->DrawDebugGravityField();
-			}
-		}
+		DebugLines->Flush();  
+		DrawDebugGravityField();
 	}
 }
 

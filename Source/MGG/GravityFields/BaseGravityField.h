@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "MGG/Utils/GravityFieldDrawer.h"
 #include "BaseGravityField.generated.h"
 
 UENUM(BlueprintType)
@@ -33,11 +34,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bShowDebugField = true;
 
-	static TArray<ABaseGravityField*> AllGravityFields;
-
 protected:
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void RedrawDebugField();
 
@@ -52,4 +50,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Gravity")
 	float GravityRadius = 500.0f;
+
+	TUniquePtr<GravityFieldDrawer> currentDrawer;
+
+	UPROPERTY()
+	ULineBatchComponent* DebugLines;
 };

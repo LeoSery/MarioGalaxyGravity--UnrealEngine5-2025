@@ -11,25 +11,16 @@ void ASphereGravityField::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ASphereGravityField::ApplyGravity()
-{
-	// TODO: Implémenter la gravité sphérique
-}
 
 void ASphereGravityField::DrawDebugGravityField()
 {
-	if (bShowDebugField)
+	if (bShowDebugField && currentDrawer)
 	{
-		DrawDebugSphere(
-			GetWorld(),
-			GetActorLocation(),
-			GravityRadius,
-			32,
-			FColor::Blue,
-			true,
-			-1.0f,
-			0,
-			2.0f
-		);
+		currentDrawer->DrawSphere(GetActorLocation(), GravityRadius, 32, FColor::Red);
 	}
+}
+
+void ASphereGravityField::ApplyGravity()
+{
+	// TODO: Implement custom gravity field
 }

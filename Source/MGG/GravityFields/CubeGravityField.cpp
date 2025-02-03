@@ -13,24 +13,13 @@ void ACubeGravityField::BeginPlay()
 
 void ACubeGravityField::DrawDebugGravityField()
 {
-	if (bShowDebugField)
+	if (bShowDebugField && currentDrawer)
 	{
-		FVector Extent(GravityRadius);
-		DrawDebugBox(
-			GetWorld(),
-			GetActorLocation(),
-			Extent,
-			GetActorRotation().Quaternion(),
-			FColor::Blue,
-			true,
-			-1.0f,
-			0,
-			2.0f
-		);
+		currentDrawer->DrawCube(GetActorLocation(), FVector(GravityRadius), GetActorRotation(), FColor::Red);
 	}
 }
 
 void ACubeGravityField::ApplyGravity()
 {
-	// TODO: Implémenter la gravité cubique
+	// TODO: Implement custom gravity field
 }
