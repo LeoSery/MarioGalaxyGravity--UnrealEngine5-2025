@@ -2,14 +2,26 @@
 
 UPlaneGravityFieldComponent::UPlaneGravityFieldComponent()
 {
-	GravityType = PLANE;
+	
 }
 
 void UPlaneGravityFieldComponent::DrawDebugGravityField()
 {
 	if (bShowDebugField && currentDrawer)
 	{
-		currentDrawer->DrawPlane(GetComponentLocation(), GetUpVector(), GravityRadius * 2, FColor::Red);
+		float baseSize = 0.0f;
+		if (AActor* Owner = GetOwner())
+		{
+			if (UStaticMeshComponent* MeshComp = Owner->FindComponentByClass<UStaticMeshComponent>())
+			{
+				FVector Extent = MeshComp->Bounds.BoxExtent;
+				baseSize = FMath::Max(Extent.X, Extent.Y) * 2.0f;
+			}
+		}
+		
+		float height = GravityInfluenceRange;
+		
+		currentDrawer->DrawPlane(GetComponentLocation(), GetUpVector(), baseSize, height, FColor::Red);
 	}
 }
 

@@ -7,29 +7,44 @@ UBaseGravityFieldComponent::UBaseGravityFieldComponent()
 
 	GravityStrength = 9.81f;
 	GravityFieldPriority = 0;
-	GravityType = NONE;
     
 	DebugLines = CreateDefaultSubobject<ULineBatchComponent>(TEXT("DebugLines"));
 }
 
 void UBaseGravityFieldComponent::OnRegister()
 {
+	UE_LOG(LogTemp, Warning, TEXT("BaseGravityFieldComponent::OnRegister called"));
 	Super::OnRegister();
-    
-	if (!DebugLines)
-	{
-		DebugLines = CreateDefaultSubobject<ULineBatchComponent>(TEXT("DebugLines"));
-	}
 
-	currentDrawer = MakeUnique<GravityFieldDrawer>(DebugLines);
-	if(bShowDebugField)
+	if (!currentDrawer)
 	{
-		DrawDebugGravityField();
+		currentDrawer = MakeUnique<GravityFieldDrawer>(DebugLines);
+		if(bShowDebugField)
+		{
+			DebugLines->Flush();
+			DrawDebugGravityField();
+		}
 	}
+}
+
+float UBaseGravityFieldComponent::GetTotalGravityRadius() const
+{
+	if (AActor* Owner = GetOwner())
+	{
+		if (UStaticMeshComponent* MeshComp = Owner->FindComponentByClass<UStaticMeshComponent>())
+		{
+			FVector Extent = MeshComp->Bounds.BoxExtent;
+			float MeshRadius = Extent.GetMax();
+			
+			return FMath::Max(MeshRadius, MeshRadius + GravityInfluenceRange);
+		}
+	}
+	return GravityInfluenceRange;
 }
 
 void UBaseGravityFieldComponent::RedrawDebugField()
 {
+	UE_LOG(LogTemp, Warning, TEXT("BaseGravityFieldComponent::RedrawDebugField called"));
 	if (bShowDebugField && DebugLines)
 	{
 		DebugLines->Flush();  
@@ -53,10 +68,9 @@ void UBaseGravityFieldComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? 
-						 PropertyChangedEvent.Property->GetFName() : NAME_None;
+	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
                          
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UBaseGravityFieldComponent, GravityRadius))
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UBaseGravityFieldComponent, GravityInfluenceRange))
 	{
 		RedrawDebugField();
 	}

@@ -206,10 +206,69 @@ void GravityFieldDrawer::DrawPlane(const FVector& Center, const FVector& Normal,
 	DrawLine(GridCenter, GridCenter + Normal * (Size * 0.2f), FColor::Red);
 }
 
+void GravityFieldDrawer::DrawPlane(const FVector& Center, const FVector& Normal, float Size, float Height, const FColor& Color)
+{
+	FVector AxisX, AxisY;
+    Normal.FindBestAxisVectors(AxisX, AxisY);
+    
+    const int32 NumLines = 10;
+    const float Step = Size / float(NumLines);
+	
+    FVector VolumeBase = Center;
+	
+    for(int32 i = -NumLines/2; i <= NumLines/2; i++)
+    {
+        // X lines
+        DrawLine(
+            VolumeBase + AxisX * Size * 0.5f + AxisY * (Step * i),
+            VolumeBase - AxisX * Size * 0.5f + AxisY * (Step * i),
+            Color
+        );
+        
+        // Y lines
+        DrawLine(
+            VolumeBase + AxisY * Size * 0.5f + AxisX * (Step * i),
+            VolumeBase - AxisY * Size * 0.5f + AxisX * (Step * i),
+            Color
+        );
+    }
+	
+    FVector TopCenter = VolumeBase + Normal * Height;
+    
+    // Corner vertical lines
+    DrawLine(VolumeBase + AxisX * Size * 0.5f + AxisY * Size * 0.5f, 
+             TopCenter + AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
+             
+    DrawLine(VolumeBase + AxisX * Size * 0.5f - AxisY * Size * 0.5f,
+             TopCenter + AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
+             
+    DrawLine(VolumeBase - AxisX * Size * 0.5f + AxisY * Size * 0.5f,
+             TopCenter - AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
+             
+    DrawLine(VolumeBase - AxisX * Size * 0.5f - AxisY * Size * 0.5f,
+             TopCenter - AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
+    
+    // Volume Box
+    DrawLine(TopCenter + AxisX * Size * 0.5f + AxisY * Size * 0.5f,
+             TopCenter + AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
+             
+    DrawLine(TopCenter + AxisX * Size * 0.5f - AxisY * Size * 0.5f,
+             TopCenter - AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
+             
+    DrawLine(TopCenter - AxisX * Size * 0.5f - AxisY * Size * 0.5f,
+             TopCenter - AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
+             
+    DrawLine(TopCenter - AxisX * Size * 0.5f + AxisY * Size * 0.5f,
+             TopCenter + AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
+
+    // Norml arrow
+    DrawLine(VolumeBase, VolumeBase + Normal * (Size * 0.2f), FColor::Red);
+}
+
 void GravityFieldDrawer::DrawLine(const FVector& Start, const FVector& End, const FColor& Color)
 {
 	if (DebugLines)
 	{
-		DebugLines->DrawLine(Start, End, Color, 0, 2.0f);
+		DebugLines->DrawLine(Start, End, Color, 0, 5.0f);
 	}
 }

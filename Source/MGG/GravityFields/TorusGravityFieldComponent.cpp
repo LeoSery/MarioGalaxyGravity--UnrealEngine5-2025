@@ -2,14 +2,14 @@
 
 UTorusGravityFieldComponent::UTorusGravityFieldComponent()
 {
-	GravityType = TORUS;
+	
 }
 
 void UTorusGravityFieldComponent::DrawDebugGravityField()
 {
 	if (bShowDebugField && currentDrawer)
 	{
-		currentDrawer->DrawTorus(GetComponentLocation(), GravityRadius, GravityRadius * 0.2f, 32, FColor::Red);
+		currentDrawer->DrawTorus(GetComponentLocation(), GetTotalGravityRadius(), GetTotalGravityRadius() * 0.2f, 32, FColor::Red);
 	}
 }
 

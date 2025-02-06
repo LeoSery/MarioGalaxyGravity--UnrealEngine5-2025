@@ -2,14 +2,14 @@
 
 USphereGravityFieldComponent::USphereGravityFieldComponent()
 {
-	GravityType = SPHERE;
+	
 }
 
 void USphereGravityFieldComponent::DrawDebugGravityField()
 {
 	if (bShowDebugField && currentDrawer)
 	{
-		currentDrawer->DrawSphere(GetComponentLocation(), GravityRadius, 32, FColor::Red);
+		currentDrawer->DrawSphere(GetComponentLocation(), GetTotalGravityRadius(), 32, FColor::Red);
 	}
 }
 

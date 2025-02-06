@@ -2,14 +2,15 @@
 
 UCubeGravityFieldComponent::UCubeGravityFieldComponent()
 {
-	GravityType = CUBE;
+	
 }
 
 void UCubeGravityFieldComponent::DrawDebugGravityField()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Drawing debug cube gravity field"));
 	if (bShowDebugField && currentDrawer)
 	{
-		currentDrawer->DrawCube(GetComponentLocation(), FVector(GravityRadius), GetComponentRotation(), FColor::Red );
+		currentDrawer->DrawCube(GetComponentLocation(), FVector( GetTotalGravityRadius()), GetComponentRotation(), FColor::Red );
 	}
 }
 
