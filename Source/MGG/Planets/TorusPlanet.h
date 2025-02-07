@@ -21,5 +21,4 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UTorusGravityFieldComponent* TorusGravityField;
 
-	virtual void InitializeGravityField();
 };

@@ -4,9 +4,6 @@ APlanePlanet::APlanePlanet()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	PlanetRadius = 1000.0f;
-	PlanetGravity = 9.81f;
-
 	PlaneGravityField = CreateDefaultSubobject<UPlaneGravityFieldComponent>(TEXT("PlaneGravityField"));
 	PlaneGravityField->SetupAttachment(RootComponent);
 }
@@ -14,15 +11,7 @@ APlanePlanet::APlanePlanet()
 void APlanePlanet::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void APlanePlanet::InitializeGravityField()
-{
-	if (PlaneGravityField)
-	{
-		PlaneGravityField->SetGravityInfluenceRange(PlanetRadius);
-		PlaneGravityField->SetGravityStrength(PlanetGravity);
-	}
+	SyncGravityFieldSettings();
 }
 
 void APlanePlanet::Tick(float DeltaTime)
@@ -47,22 +36,22 @@ void APlanePlanet::OnConstruction(const FTransform& Transform)
 		//PlaneGravityField->SetRelativeLocation(totalOffset);
 	}
 	
-	InitializeGravityField();
+	SyncGravityFieldSettings();
 }
 
-void APlanePlanet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(APlanePlanet, InitialOffset) ||
-		PropertyName == GET_MEMBER_NAME_CHECKED(APlanePlanet, InitialRotation))
-	{
-		if (PlanetMesh)
-		{
-			//PlanetMesh->SetRelativeLocation(InitialOffset);
-			//PlanetMesh->SetRelativeRotation(InitialRotation);
-		}
-	}
-}
+// void APlanePlanet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
+//
+// 	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+//
+// 	if (PropertyName == GET_MEMBER_NAME_CHECKED(APlanePlanet, InitialOffset) ||
+// 		PropertyName == GET_MEMBER_NAME_CHECKED(APlanePlanet, InitialRotation))
+// 	{
+// 		if (PlanetMesh)
+// 		{
+// 			//PlanetMesh->SetRelativeLocation(InitialOffset);
+// 			//PlanetMesh->SetRelativeRotation(InitialRotation);
+// 		}
+// 	}
+// }

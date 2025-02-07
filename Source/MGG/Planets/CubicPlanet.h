@@ -20,7 +20,5 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCubeGravityFieldComponent* CubeGravityField;
-
-	virtual void InitializeGravityField();
 	
 };

@@ -4,9 +4,6 @@ ASpherePlanet::ASpherePlanet()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	PlanetRadius = 1000.0f;
-	PlanetGravity = 9.81f;
-
 	SphereGravityField = CreateDefaultSubobject<USphereGravityFieldComponent>(TEXT("SphereGravityField"));
 	SphereGravityField->SetupAttachment(RootComponent);
 }
@@ -14,15 +11,7 @@ ASpherePlanet::ASpherePlanet()
 void ASpherePlanet::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ASpherePlanet::InitializeGravityField()
-{
-	if (SphereGravityField)
-	{
-		SphereGravityField->SetGravityInfluenceRange(PlanetRadius);
-		SphereGravityField->SetGravityStrength(PlanetGravity);
-	}
+	SyncGravityFieldSettings();
 }
 
 void ASpherePlanet::Tick(float DeltaTime)
@@ -33,5 +22,5 @@ void ASpherePlanet::Tick(float DeltaTime)
 void ASpherePlanet::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	InitializeGravityField();
+	SyncGravityFieldSettings();
 }

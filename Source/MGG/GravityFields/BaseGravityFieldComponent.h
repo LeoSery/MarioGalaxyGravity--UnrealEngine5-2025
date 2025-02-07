@@ -40,14 +40,9 @@ public:
 protected:
 	virtual void OnRegister() override;
 	
-	UPROPERTY(EditAnywhere, Category = "Gravity")
 	float GravityStrength;
-
-	UPROPERTY(EditAnywhere, Category = "Gravity")
 	int32 GravityFieldPriority;
-	
-	UPROPERTY(EditAnywhere, Category = "Gravity")
-	float GravityInfluenceRange = 500.0f;
+	float GravityInfluenceRange;
 
 	TUniquePtr<GravityFieldDrawer> currentDrawer;
 

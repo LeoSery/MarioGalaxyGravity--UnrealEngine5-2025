@@ -4,9 +4,6 @@ ACubicPlanet::ACubicPlanet()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	PlanetRadius = 1000.0f;
-	PlanetGravity = 9.81f;
-
 	CubeGravityField = CreateDefaultSubobject<UCubeGravityFieldComponent>(TEXT("CubeGravityField"));
 	CubeGravityField->SetupAttachment(RootComponent);
 }
@@ -14,15 +11,7 @@ ACubicPlanet::ACubicPlanet()
 void ACubicPlanet::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ACubicPlanet::InitializeGravityField()
-{
-	if (CubeGravityField)
-	{
-		CubeGravityField->SetGravityInfluenceRange(PlanetRadius);
-		CubeGravityField->SetGravityStrength(PlanetGravity);
-	}
+	SyncGravityFieldSettings();
 }
 
 void ACubicPlanet::Tick(float DeltaTime)
@@ -33,5 +22,5 @@ void ACubicPlanet::Tick(float DeltaTime)
 void ACubicPlanet::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	InitializeGravityField();
+	SyncGravityFieldSettings();
 }

@@ -10,7 +10,9 @@ ABasePlanet::ABasePlanet()
 	RootComponent = PlanetMesh;
 	
 	PlanetRadius = 1000.0f;
-	PlanetGravity = 9.81f;
+	GravityStrength = 9.81f;
+	GravityFieldPriority = 0;
+	GravityInfluenceRange = 1000.0f;
 
 	if (PlanetMesh && DefaultMesh)
 	{
@@ -68,6 +70,12 @@ void ABasePlanet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 	{
 		UpdatePlanetMesh();
 	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(ABasePlanet, GravityStrength) ||
+			 PropertyName == GET_MEMBER_NAME_CHECKED(ABasePlanet, GravityFieldPriority) ||
+			 PropertyName == GET_MEMBER_NAME_CHECKED(ABasePlanet, GravityInfluenceRange))
+	{
+		SyncGravityFieldSettings();
+	}
 	
 	if (UBaseGravityFieldComponent* GravityField = GetComponentByClass<UBaseGravityFieldComponent>()) //work but not optimized -> disable it after level design
 	{
@@ -82,5 +90,20 @@ void ABasePlanet::PostEditMove(bool bFinished)
 	if (UBaseGravityFieldComponent* GravityField = GetComponentByClass<UBaseGravityFieldComponent>())
 	{
 		GravityField->RedrawDebugField();
+	}
+}
+
+void ABasePlanet::SyncGravityFieldSettings()
+{
+	if (UBaseGravityFieldComponent* GravityField = GetComponentByClass<UBaseGravityFieldComponent>())
+	{
+		if (GravityField->GetGravityStrength() != GravityStrength)
+			GravityField->SetGravityStrength(GravityStrength);
+            
+		if (GravityField->GetGravityFieldPriority() != GravityFieldPriority)
+			GravityField->SetGravityFieldPriority(GravityFieldPriority);
+            
+		if (GravityField->GetGravityInfluenceRange() != GravityInfluenceRange)
+			GravityField->SetGravityInfluenceRange(GravityInfluenceRange);
 	}
 }

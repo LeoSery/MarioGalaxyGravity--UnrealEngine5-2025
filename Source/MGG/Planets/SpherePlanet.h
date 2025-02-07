@@ -20,6 +20,5 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereGravityFieldComponent* SphereGravityField;
-
-	virtual void InitializeGravityField();
+	
 };
