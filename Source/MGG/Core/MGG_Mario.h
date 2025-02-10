@@ -1,20 +1,23 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "MGG/Utils/Interfaces/GravityAffected.h"
 #include <EnhancedInputLibrary.h>
-
 #include "MGG_Mario.generated.h"
 
 
-
 UCLASS()
-class MGG_API AMGG_Mario : public APawn
+class MGG_API AMGG_Mario : public APawn, public IGravityAffected
 {
 	GENERATED_BODY()
 
+private:
+	bool bIsInGravityField = false;
+
+public:
+	AMGG_Mario();
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = Input,meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
@@ -25,13 +28,25 @@ class MGG_API AMGG_Mario : public APawn
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	virtual void Tick(float DeltaTime) override;
 
-public:
-	// Sets default values for this pawn's properties
-	AMGG_Mario();
+	void PhysicProcess(float DeltaTime);
+	
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	//IGravityAffected Interface methods
+	virtual void OnEnterGravityField(const FVector& NewGravityVector) override;
+	virtual void OnExitGravityField() override;
+	virtual FVector& GetGravityVector() override { return GravityVector; }
+
+	UPROPERTY()
+	FVector Velocity;
+
+	UPROPERTY()
+	FVector GravityVector;
+	
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& Value);
@@ -39,22 +54,5 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Jump();
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	void PhysicProcess(float DeltaTime);
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY()
-	FVector Velocity;
-
-	UPROPERTY()
-	FVector GravityVector;
-
-
 
 };

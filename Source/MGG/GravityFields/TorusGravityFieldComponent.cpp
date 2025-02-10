@@ -13,7 +13,18 @@ void UTorusGravityFieldComponent::DrawDebugGravityField()
 	}
 }
 
-void UTorusGravityFieldComponent::ApplyGravity()
+// Torus gravity field is not implemented yet
+FVector UTorusGravityFieldComponent::CalculateGravityVector(const FVector& TargetLocation) const
 {
-	// TODO: Implement custom gravity field
+	return FVector::ZeroVector;
+}
+
+UBaseGravityFieldComponent::FGravityFieldDimensions UTorusGravityFieldComponent::CalculateFieldDimensions() const
+{
+	return FGravityFieldDimensions();
+}
+
+void UTorusGravityFieldComponent::UpdateGravityVolume()
+{
+	
 }

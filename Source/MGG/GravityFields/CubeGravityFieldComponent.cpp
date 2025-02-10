@@ -14,7 +14,18 @@ void UCubeGravityFieldComponent::DrawDebugGravityField()
 	}
 }
 
-void UCubeGravityFieldComponent::ApplyGravity()
+// Cube gravity field is not implemented yet 
+FVector UCubeGravityFieldComponent::CalculateGravityVector(const FVector& TargetLocation) const
 {
-	// TODO: Implement custom gravity field
+	return FVector::ZeroVector;
+}
+
+UBaseGravityFieldComponent::FGravityFieldDimensions UCubeGravityFieldComponent::CalculateFieldDimensions() const
+{
+	return FGravityFieldDimensions();
+}
+
+void UCubeGravityFieldComponent::UpdateGravityVolume()
+{
+
 }

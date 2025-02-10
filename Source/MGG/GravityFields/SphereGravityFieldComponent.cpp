@@ -13,7 +13,18 @@ void USphereGravityFieldComponent::DrawDebugGravityField()
 	}
 }
 
-void USphereGravityFieldComponent::ApplyGravity()
+// Sphere gravity field is not implemented yet
+FVector USphereGravityFieldComponent::CalculateGravityVector(const FVector& TargetLocation) const
 {
-	// TODO: Implement custom gravity field
+	return FVector::ZeroVector;
+}
+
+UBaseGravityFieldComponent::FGravityFieldDimensions USphereGravityFieldComponent::CalculateFieldDimensions() const
+{
+	return FGravityFieldDimensions();
+}
+
+void USphereGravityFieldComponent::UpdateGravityVolume()
+{
+	
 }

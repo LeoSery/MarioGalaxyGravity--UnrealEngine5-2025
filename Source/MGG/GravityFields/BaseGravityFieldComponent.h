@@ -12,13 +12,11 @@ class MGG_API UBaseGravityFieldComponent : public USceneComponent
 
 public:
 	UBaseGravityFieldComponent();
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
 	virtual void OnUpdateTransform(EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport = ETeleportType::None) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-    
+	
 	virtual void DrawDebugGravityField() PURE_VIRTUAL(UBaseGravityFieldComponent::DrawDebugGravityField,);
-	virtual void ApplyGravity() PURE_VIRTUAL(UBaseGravityFieldComponent::ApplyGravity,);
 
 	// Getters
 	float GetGravityStrength() const { return GravityStrength; }
@@ -33,11 +31,23 @@ public:
 	void SetGravityInfluenceRange(float NewGravityRadius) { GravityInfluenceRange = NewGravityRadius; }
 
 	void RedrawDebugField();
+
+	UFUNCTION()
+	void OnGravityVolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnGravityVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bShowDebugField = true;
     
 protected:
+	struct FGravityFieldDimensions
+	{
+		FVector Size;
+		FVector Center;
+	};
+	
 	virtual void OnRegister() override;
 	
 	float GravityStrength;
@@ -48,4 +58,17 @@ protected:
 
 	UPROPERTY()
 	ULineBatchComponent* DebugLines;
+
+	UPROPERTY(VisibleAnywhere)
+	UShapeComponent* GravityVolume;
+	
+	void UpdateFieldDimensions();
+
+	virtual void UpdateGravityVolume() PURE_VIRTUAL(UBaseGravityFieldComponent::UpdateGravityVolume,);
+	
+	FGravityFieldDimensions CurrentDimensions;
+	
+	virtual FGravityFieldDimensions CalculateFieldDimensions() const PURE_VIRTUAL(UBaseGravityFieldComponent::CalculateFieldDimensions, return FGravityFieldDimensions(););
+	
+	virtual FVector CalculateGravityVector(const FVector& TargetLocation) const PURE_VIRTUAL(UBaseGravityFieldComponent::CalculateGravityVector, return FVector::ZeroVector;);
 };

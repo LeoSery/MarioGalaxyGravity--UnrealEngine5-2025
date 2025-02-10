@@ -1,5 +1,7 @@
 ﻿#include "BaseGravityFieldComponent.h"
+#include "MGG//Utils/Interfaces/GravityAffected.h"
 #include "Components/LineBatchComponent.h"
+#include "Components/ShapeComponent.h"
 
 UBaseGravityFieldComponent::UBaseGravityFieldComponent()
 {
@@ -13,8 +15,9 @@ UBaseGravityFieldComponent::UBaseGravityFieldComponent()
 
 void UBaseGravityFieldComponent::OnRegister()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BaseGravityFieldComponent::OnRegister called"));
 	Super::OnRegister();
+
+	UpdateFieldDimensions();
 
 	if (!currentDrawer)
 	{
@@ -23,6 +26,43 @@ void UBaseGravityFieldComponent::OnRegister()
 		{
 			DebugLines->Flush();
 			DrawDebugGravityField();
+		}
+	}
+}
+
+void UBaseGravityFieldComponent::UpdateFieldDimensions()
+{
+	CurrentDimensions = CalculateFieldDimensions();
+	UpdateGravityVolume();
+}
+
+void UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("-----"));
+	UE_LOG(LogTemp, Warning, TEXT("Begin Overlap - Actor: %s"), *OtherActor->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("Component: %s"), *OtherComp->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("Volume: %s"), *GravityVolume->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("Location: %s"), *OtherActor->GetActorLocation().ToString());
+	
+	if (OtherActor && OtherActor->Implements<UGravityAffected>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("The actor implements the IGravityAffected interface"));
+		if (IGravityAffected* GravityAffected = Cast<IGravityAffected>(OtherActor))
+		{
+			FVector GravityVector = CalculateGravityVector(OtherActor->GetActorLocation());
+			UE_LOG(LogTemp, Warning, TEXT("Applied gravity vector : %s"), *GravityVector.ToString());
+			GravityAffected->OnEnterGravityField(GravityVector);
+		}
+	}
+}
+
+void UBaseGravityFieldComponent::OnGravityVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && OtherActor->Implements<UGravityAffected>())
+	{
+		if (IGravityAffected* GravityAffected = Cast<IGravityAffected>(OtherActor))
+		{
+			GravityAffected->OnExitGravityField();
 		}
 	}
 }
@@ -44,7 +84,6 @@ float UBaseGravityFieldComponent::GetTotalGravityRadius() const
 
 void UBaseGravityFieldComponent::RedrawDebugField()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BaseGravityFieldComponent::RedrawDebugField called"));
 	if (bShowDebugField && DebugLines)
 	{
 		DebugLines->Flush();  
@@ -52,15 +91,10 @@ void UBaseGravityFieldComponent::RedrawDebugField()
 	}
 }
 
-void UBaseGravityFieldComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	ApplyGravity();
-}
-
 void UBaseGravityFieldComponent::OnUpdateTransform(EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
 {
 	Super::OnUpdateTransform(UpdateTransformFlags, Teleport);
+	UpdateFieldDimensions();
 	RedrawDebugField();
 }
 
@@ -72,6 +106,7 @@ void UBaseGravityFieldComponent::PostEditChangeProperty(FPropertyChangedEvent& P
                          
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(UBaseGravityFieldComponent, GravityInfluenceRange))
 	{
+		UpdateFieldDimensions();
 		RedrawDebugField();
 	}
 }

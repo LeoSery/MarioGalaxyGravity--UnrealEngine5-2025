@@ -11,8 +11,10 @@ class MGG_API UTorusGravityFieldComponent : public UBaseGravityFieldComponent
 
 public:
 	UTorusGravityFieldComponent();
-	virtual void ApplyGravity() override;
 
 protected:
 	virtual void DrawDebugGravityField() override;
+	virtual FVector CalculateGravityVector(const FVector& TargetLocation) const override;
+	virtual FGravityFieldDimensions CalculateFieldDimensions() const override;
+	virtual void UpdateGravityVolume() override;
 };
