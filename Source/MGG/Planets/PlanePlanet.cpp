@@ -14,11 +14,6 @@ void APlanePlanet::BeginPlay()
 	SyncGravityFieldSettings();
 }
 
-void APlanePlanet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void APlanePlanet::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
@@ -31,27 +26,13 @@ void APlanePlanet::OnConstruction(const FTransform& Transform)
 		
 		FVector meshOffset = FVector(0.0f, 0.0f, -meshHeight * 0.5f);
 		FVector totalOffset = InitialOffset + meshOffset;
-		
-		//PlanetMesh->SetRelativeLocation(totalOffset);
-		//PlaneGravityField->SetRelativeLocation(totalOffset);
 	}
 	
 	SyncGravityFieldSettings();
-}
 
-// void APlanePlanet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-// {
-// 	Super::PostEditChangeProperty(PropertyChangedEvent);
-//
-// 	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-//
-// 	if (PropertyName == GET_MEMBER_NAME_CHECKED(APlanePlanet, InitialOffset) ||
-// 		PropertyName == GET_MEMBER_NAME_CHECKED(APlanePlanet, InitialRotation))
-// 	{
-// 		if (PlanetMesh)
-// 		{
-// 			//PlanetMesh->SetRelativeLocation(InitialOffset);
-// 			//PlanetMesh->SetRelativeRotation(InitialRotation);
-// 		}
-// 	}
-// }
+	if (PlaneGravityField)
+	{
+		PlaneGravityField->UpdateFieldDimensions();
+		PlaneGravityField->RedrawDebugField();
+	}
+}

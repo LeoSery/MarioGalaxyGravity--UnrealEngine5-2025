@@ -12,9 +12,7 @@ class MGG_API APlanePlanet : public ABasePlanet
 
 public:
 	APlanePlanet();
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
-	//virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 protected:
 	virtual void BeginPlay() override;
