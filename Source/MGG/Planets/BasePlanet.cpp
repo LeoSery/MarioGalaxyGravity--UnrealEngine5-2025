@@ -7,6 +7,7 @@ ABasePlanet::ABasePlanet()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PlanetMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlanetMesh"));
+	PlanetMesh->SetGenerateOverlapEvents(false);
 	RootComponent = PlanetMesh;
 	
 	PlanetRadius = 1000.0f;
@@ -22,6 +23,10 @@ ABasePlanet::ABasePlanet()
 
 void ABasePlanet::BeginPlay()
 {
+	if (UBaseGravityFieldComponent* GravityField = GetComponentByClass<UBaseGravityFieldComponent>()) {
+		GravityField->UpdateGravityVolume();
+		GravityField->RedrawDebugField();
+	}
 	Super::BeginPlay();
 }
 

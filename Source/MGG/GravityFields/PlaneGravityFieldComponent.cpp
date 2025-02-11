@@ -8,10 +8,13 @@ UPlaneGravityFieldComponent::UPlaneGravityFieldComponent()
 	GravityVolume = BoxVolume;
 	GravityVolume->SetupAttachment(this);
 	
-	GravityVolume->SetCollisionProfileName(TEXT("Trigger"));
+	GravityVolume->SetCollisionProfileName(TEXT("OverlapAll"));
+	GravityVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GravityVolume->SetGenerateOverlapEvents(true);
+
 	
 	BoxVolume->SetBoxExtent(FVector(1000.0f, 1000.0f, 500.0f));
-	
+
 	GravityVolume->OnComponentBeginOverlap.AddDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap);
 	GravityVolume->OnComponentEndOverlap.AddDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeEndOverlap);
 }
@@ -25,7 +28,7 @@ void UPlaneGravityFieldComponent::DrawDebugGravityField()
 			GetUpVector(), 
 			CurrentDimensions.Size.X,
 			CurrentDimensions.Size.Z,
-			FColor::Red
+			FColor::Orange
 		);
 	}
 }

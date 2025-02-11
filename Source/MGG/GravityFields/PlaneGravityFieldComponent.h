@@ -11,10 +11,10 @@ class MGG_API UPlaneGravityFieldComponent : public UBaseGravityFieldComponent
 
 public:
 	UPlaneGravityFieldComponent();
-
+	virtual void UpdateGravityVolume() override;
 protected:
 	virtual void DrawDebugGravityField() override;
 	virtual FVector CalculateGravityVector(const FVector& TargetLocation) const override;
 	virtual FGravityFieldDimensions CalculateFieldDimensions() const override;
-	virtual void UpdateGravityVolume() override;
+	
 };

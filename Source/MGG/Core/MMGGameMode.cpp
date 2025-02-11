@@ -3,5 +3,9 @@
 
 AMMGGameMode::AMMGGameMode()
 {
-	DefaultPawnClass = AMGG_Mario::StaticClass();
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/BP_Mario"));
+	if (PlayerPawnBPClass.Class != NULL)
+	{
+		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
 }

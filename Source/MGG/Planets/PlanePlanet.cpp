@@ -12,6 +12,11 @@ void APlanePlanet::BeginPlay()
 {
 	Super::BeginPlay();
 	SyncGravityFieldSettings();
+
+	if (PlaneGravityField)
+	{
+		PlaneGravityField->UpdateFieldDimensions();
+	}
 }
 
 void APlanePlanet::OnConstruction(const FTransform& Transform)

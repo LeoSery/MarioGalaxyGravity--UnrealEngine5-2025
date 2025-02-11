@@ -6,6 +6,12 @@
 #include <EnhancedInputLibrary.h>
 #include "MGG_Mario.generated.h"
 
+class USpringArmComponent;
+class UCameraComponent;
+class UInputMappingContext;
+class UInputAction;
+struct FInputActionValue;
+
 
 UCLASS()
 class MGG_API AMGG_Mario : public APawn, public IGravityAffected
@@ -35,16 +41,29 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	//IGravityAffected Interface methods
-	virtual void OnEnterGravityField(const FVector& NewGravityVector) override;
-	virtual void OnExitGravityField() override;
+	virtual void OnEnterGravityField_Implementation(const FVector& NewGravityVector) override;
+	virtual void OnExitGravityField_Implementation() override;
 	virtual FVector& GetGravityVector() override { return GravityVector; }
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FVector Velocity;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FVector GravityVector;
+
+	UPROPERTY(EditAnywhere, Category = Movement)
+	float Speed = 500.0f;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* MeshComponent;
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -54,5 +73,7 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Jump();
+
+	void StopJumping();
 
 };

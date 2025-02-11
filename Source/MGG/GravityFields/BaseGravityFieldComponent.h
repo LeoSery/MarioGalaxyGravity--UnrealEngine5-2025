@@ -32,7 +32,7 @@ public:
 
 	void RedrawDebugField();
 	void UpdateFieldDimensions();
-
+	virtual void UpdateGravityVolume() PURE_VIRTUAL(UBaseGravityFieldComponent::UpdateGravityVolume, );
 	UFUNCTION()
 	void OnGravityVolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -63,7 +63,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UShapeComponent* GravityVolume;
 
-	virtual void UpdateGravityVolume() PURE_VIRTUAL(UBaseGravityFieldComponent::UpdateGravityVolume,);
+	
 	
 	FGravityFieldDimensions CurrentDimensions;
 	
