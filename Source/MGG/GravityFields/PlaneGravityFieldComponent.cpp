@@ -1,5 +1,4 @@
 ﻿#include "PlaneGravityFieldComponent.h"
-
 #include "Components/BoxComponent.h"
 
 UPlaneGravityFieldComponent::UPlaneGravityFieldComponent()

@@ -12,15 +12,21 @@ void ASpherePlanet::BeginPlay()
 {
 	Super::BeginPlay();
 	SyncGravityFieldSettings();
-}
 
-void ASpherePlanet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	if (SphereGravityField)
+	{
+		SphereGravityField->UpdateFieldDimensions();
+	}
 }
 
 void ASpherePlanet::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	SyncGravityFieldSettings();
+
+	if (SphereGravityField)
+	{
+		SphereGravityField->UpdateFieldDimensions();
+		SphereGravityField->RedrawDebugField();
+	}
 }

@@ -12,7 +12,6 @@ class MGG_API ASpherePlanet : public ABasePlanet
 
 public:
 	ASpherePlanet();
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
