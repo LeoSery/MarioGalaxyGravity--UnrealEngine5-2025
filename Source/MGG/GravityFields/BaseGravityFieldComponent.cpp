@@ -47,8 +47,10 @@ void UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap(UPrimitiveComponent
 	if (OtherActor && OtherActor->Implements<UGravityAffected>())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("The actor implements the IGravityAffected interface"));
-		if (Cast<IGravityAffected>(OtherActor))
+		if (IGravityAffected* AffectedActor = Cast<IGravityAffected>(OtherActor))
 		{
+			AffectedActor->CurrentGravityField = this;
+			
 			FVector GravityVector = CalculateGravityVector(OtherActor->GetActorLocation());
 			UE_LOG(LogTemp, Warning, TEXT("Applied gravity vector : %s"), *GravityVector.ToString());
 			IGravityAffected::Execute_OnEnterGravityField(OtherActor, GravityVector);
@@ -60,8 +62,9 @@ void UBaseGravityFieldComponent::OnGravityVolumeEndOverlap(UPrimitiveComponent* 
 {
 	if (OtherActor && OtherActor->Implements<UGravityAffected>())
 	{
-		if (Cast<IGravityAffected>(OtherActor))
+		if (IGravityAffected* AffectedActor = Cast<IGravityAffected>(OtherActor))
 		{
+			AffectedActor->CurrentGravityField = nullptr;
 			IGravityAffected::Execute_OnExitGravityField(OtherActor);
 		}
 	}

@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "MGG/GravityFields/BaseGravityFieldComponent.h"
 
 AMGG_Mario::AMGG_Mario()
 {
@@ -90,11 +91,13 @@ void AMGG_Mario::Tick(float DeltaTime)
 
 void AMGG_Mario::PhysicProcess(float DeltaTime)
 {
+	UpdateCurrentGravityField();
+	
 	float UsingGravity = 1;
 
 	FVector PointDepart = GetActorLocation();
 
-	// Point d'arrivée (direction vers l'avant * distance)
+	// Point d'arrivï¿½e (direction vers l'avant * distance)
 	FVector Direction = GetActorUpVector();
 	FVector PointArrivee = PointDepart + (-1* Direction * 31.0f);
 
@@ -124,7 +127,7 @@ void AMGG_Mario::PhysicProcess(float DeltaTime)
 		1.0f
 	);
 
-	// Si le raycast a touché quelque chose
+	// Si le raycast a touchï¿½ quelque chose
 	if (aHit)
 		UsingGravity = 0;
 	else
@@ -179,5 +182,13 @@ void AMGG_Mario::OnExitGravityField_Implementation()
 		bIsInGravityField = false;
 		GravityVector = FVector(0, 0, -980.0f);
 		UE_LOG(LogTemp, Warning, TEXT("Player: leaving the gravity field"));
+	}
+}
+
+void AMGG_Mario::UpdateCurrentGravityField()
+{
+	if (CurrentGravityField)
+	{
+		GravityVector = CurrentGravityField->CalculateGravityVector(GetActorLocation());
 	}
 }

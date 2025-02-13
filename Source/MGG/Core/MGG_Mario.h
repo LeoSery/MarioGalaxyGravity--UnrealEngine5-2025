@@ -44,6 +44,7 @@ public:
 	virtual void OnEnterGravityField_Implementation(const FVector& NewGravityVector) override;
 	virtual void OnExitGravityField_Implementation() override;
 	virtual FVector& GetGravityVector() override { return GravityVector; }
+	virtual void UpdateCurrentGravityField() override;
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector Velocity;

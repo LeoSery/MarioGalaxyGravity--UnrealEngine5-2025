@@ -17,4 +17,6 @@ protected:
 	virtual void DrawDebugGravityField() override;
 	virtual FVector CalculateGravityVector(const FVector& TargetLocation) const override;
 	virtual FGravityFieldDimensions CalculateFieldDimensions() const override;
+
+	FORCEINLINE virtual bool RequiresConstantGravityUpdate() const override { return true; } 
 };

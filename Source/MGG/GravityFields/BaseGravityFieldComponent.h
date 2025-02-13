@@ -41,7 +41,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bShowDebugField = true;
-    
+
+	virtual bool RequiresConstantGravityUpdate() const PURE_VIRTUAL(UBaseGravityFieldComponent::RequiresConstantGravityUpdate, return false;);
+	virtual FVector CalculateGravityVector(const FVector& TargetLocation) const PURE_VIRTUAL(UBaseGravityFieldComponent::CalculateGravityVector, return FVector::ZeroVector;);
+	
 protected:
 	struct FGravityFieldDimensions
 	{
@@ -62,12 +65,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UShapeComponent* GravityVolume;
-
-	
 	
 	FGravityFieldDimensions CurrentDimensions;
-	
 	virtual FGravityFieldDimensions CalculateFieldDimensions() const PURE_VIRTUAL(UBaseGravityFieldComponent::CalculateFieldDimensions, return FGravityFieldDimensions(););
-	
-	virtual FVector CalculateGravityVector(const FVector& TargetLocation) const PURE_VIRTUAL(UBaseGravityFieldComponent::CalculateGravityVector, return FVector::ZeroVector;);
 };
