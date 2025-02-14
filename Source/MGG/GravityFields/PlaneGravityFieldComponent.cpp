@@ -10,7 +10,6 @@ UPlaneGravityFieldComponent::UPlaneGravityFieldComponent()
 	GravityVolume->SetCollisionProfileName(TEXT("OverlapAll"));
 	GravityVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GravityVolume->SetGenerateOverlapEvents(true);
-
 	
 	BoxVolume->SetBoxExtent(FVector(1000.0f, 1000.0f, 500.0f));
 

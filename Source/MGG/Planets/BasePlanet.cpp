@@ -11,7 +11,7 @@ ABasePlanet::ABasePlanet()
 	RootComponent = PlanetMesh;
 	
 	PlanetRadius = 1000.0f;
-	GravityStrength = 9.81f;
+	GravityStrength = 981.0f;
 	GravityFieldPriority = 0;
 	GravityInfluenceRange = 1000.0f;
 

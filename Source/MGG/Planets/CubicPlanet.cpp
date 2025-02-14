@@ -12,15 +12,21 @@ void ACubicPlanet::BeginPlay()
 {
 	Super::BeginPlay();
 	SyncGravityFieldSettings();
-}
 
-void ACubicPlanet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	// if (CubeGravityField)
+	// {
+	// 	CubeGravityField->UpdateFieldDimensions();
+	// }
 }
 
 void ACubicPlanet::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	SyncGravityFieldSettings();
+
+	if (CubeGravityField)
+	{
+		CubeGravityField->UpdateFieldDimensions();
+		CubeGravityField->RedrawDebugField();
+	}
 }

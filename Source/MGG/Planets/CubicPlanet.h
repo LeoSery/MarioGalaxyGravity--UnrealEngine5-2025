@@ -12,7 +12,6 @@ class MGG_API ACubicPlanet : public ABasePlanet
 
 public:
 	ACubicPlanet();
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 	
 protected:
