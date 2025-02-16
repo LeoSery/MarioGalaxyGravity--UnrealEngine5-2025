@@ -11,7 +11,13 @@ UCubeGravityFieldComponent::UCubeGravityFieldComponent()
 	GravityVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GravityVolume->SetGenerateOverlapEvents(true);
 
-	//CubeVolume->SetBoxExtent(FVector(GetTotalGravityRadius()));
+	// if (CubeVolume)
+	// {
+	// 	CubeVolume->SetHiddenInGame(true);
+	// 	CubeVolume->SetVisibility(false);
+	// }
+	
+	CubeVolume->SetBoxExtent(FVector(GetTotalGravityRadius()));
 
 	GravityVolume->OnComponentBeginOverlap.AddDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap);
 	GravityVolume->OnComponentEndOverlap.AddDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeEndOverlap);
@@ -66,7 +72,18 @@ FVector UCubeGravityFieldComponent::CalculateGravityVector(const FVector& Target
 UBaseGravityFieldComponent::FGravityFieldDimensions UCubeGravityFieldComponent::CalculateFieldDimensions() const
 {
 	FGravityFieldDimensions Dimensions;
-	float Radius = GetTotalGravityRadius();
+	float Radius = 0.0f;
+
+	if (AActor* Owner = GetOwner())
+	{
+		if (UStaticMeshComponent* MeshComp = Owner->FindComponentByClass<UStaticMeshComponent>())
+		{
+			FVector Extent = MeshComp->GetStaticMesh()->GetBoundingBox().GetExtent();
+			FVector ActorScale = Owner->GetActorScale3D();
+			Extent = Extent * ActorScale;
+			Radius = FMath::Max3(Extent.X, Extent.Y, Extent.Z) + GravityInfluenceRange;
+		}
+	}
 	
 	Dimensions.Size = FVector(Radius);
 	Dimensions.Center = GetComponentLocation();
@@ -80,6 +97,7 @@ void UCubeGravityFieldComponent::UpdateGravityVolume()
 	{
 		CubeVolume->SetBoxExtent(CurrentDimensions.Size);
 		CubeVolume->SetWorldLocation(CurrentDimensions.Center);
+		CubeVolume->SetWorldRotation(GetComponentRotation());
 	}
 }
 

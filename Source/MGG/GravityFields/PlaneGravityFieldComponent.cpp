@@ -10,6 +10,12 @@ UPlaneGravityFieldComponent::UPlaneGravityFieldComponent()
 	GravityVolume->SetCollisionProfileName(TEXT("OverlapAll"));
 	GravityVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GravityVolume->SetGenerateOverlapEvents(true);
+
+	// if (BoxVolume)
+	// {
+	// 	BoxVolume->SetHiddenInGame(true);
+	// 	BoxVolume->SetVisibility(false);
+	// }
 	
 	BoxVolume->SetBoxExtent(FVector(1000.0f, 1000.0f, 500.0f));
 
@@ -45,7 +51,10 @@ UBaseGravityFieldComponent::FGravityFieldDimensions UPlaneGravityFieldComponent:
 	{
 		if (UStaticMeshComponent* MeshComp = Owner->FindComponentByClass<UStaticMeshComponent>())
 		{
-			FVector Extent = MeshComp->Bounds.BoxExtent;
+			FVector Extent = MeshComp->GetStaticMesh()->GetBoundingBox().GetExtent();
+			FVector ActorScale = GetOwner()->GetActorScale3D();
+			Extent = Extent * ActorScale;
+			
 			baseSize = FMath::Max(Extent.X, Extent.Y) * 2.0f;
 		}
 	}
@@ -60,8 +69,26 @@ void UPlaneGravityFieldComponent::UpdateGravityVolume()
 {
 	if (UBoxComponent* BoxVolume = Cast<UBoxComponent>(GravityVolume))
 	{
-		BoxVolume->SetBoxExtent(CurrentDimensions.Size * 0.5f);
-		FVector AdjustedCenter = CurrentDimensions.Center + FVector(0, 0, CurrentDimensions.Size.Z * 0.5f);
+		FVector MeshOffset = FVector::ZeroVector;
+		if (AActor* Owner = GetOwner())
+		{
+			if (UStaticMeshComponent* MeshComp = Owner->FindComponentByClass<UStaticMeshComponent>())
+			{
+				FBoxSphereBounds bounds = MeshComp->GetStaticMesh()->GetBounds();
+				MeshOffset = FVector(0.0f, 0.0f, bounds.BoxExtent.Z);
+			}
+		}
+
+		FVector BoxExtent = CurrentDimensions.Size * 0.5f;
+		BoxVolume->SetBoxExtent(BoxExtent);
+		
+		FRotator Rotation = GetComponentRotation();
+		FVector RotatedOffset = Rotation.RotateVector(MeshOffset);
+
+		FVector UpOffset = Rotation.RotateVector(FVector(0.0f, 0.0f, BoxExtent.Z));
+		FVector AdjustedCenter = CurrentDimensions.Center + RotatedOffset + UpOffset;
+        
 		BoxVolume->SetWorldLocation(AdjustedCenter);
+		BoxVolume->SetWorldRotation(Rotation);
 	}
 }
