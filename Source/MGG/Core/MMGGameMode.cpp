@@ -1,5 +1,4 @@
 ﻿#include "MMGGameMode.h"
-#include "MGG_Mario.h"
 
 AMMGGameMode::AMMGGameMode()
 {

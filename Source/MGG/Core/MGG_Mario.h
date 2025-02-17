@@ -12,7 +12,6 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
-
 UCLASS()
 class MGG_API AMGG_Mario : public APawn, public IGravityAffected
 {
@@ -35,9 +34,7 @@ public:
 	UInputAction* LookAction;
 
 	virtual void Tick(float DeltaTime) override;
-
 	void PhysicProcess(float DeltaTime);
-	
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	//IGravityAffected Interface methods
@@ -48,7 +45,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector Velocity;
-
 	UPROPERTY(BlueprintReadOnly)
 	FVector GravityVector;
 
@@ -67,26 +63,17 @@ public:
 
 	UPROPERTY()
 	float CameraYaw = 0.0f;
-
 	UPROPERTY()
 	float CameraPitch = 0.0f;
-
 
 protected:
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& Value);
-
 	void Look(const FInputActionValue& Value);
 
 	void Jump();
-
 	void StopJumping();
 
 	void RotatingMario();
-
-	void UpdateCameraOrientation();
-
-
-
 };
