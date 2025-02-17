@@ -27,11 +27,21 @@ AMGG_Mario::AMGG_Mario()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f;
-	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->bUsePawnControlRotation = false;     // Permet la rotation via les contrôles
+	CameraBoom->bInheritPitch = false;               // Permet le pitch pour regarder haut/bas
+	CameraBoom->bInheritYaw = false;                 // Permet la rotation horizontale
+	CameraBoom->bInheritRoll = false;               // Désactive le roll pour éviter les rotations étranges
+	CameraBoom->bDoCollisionTest = true;            // Active la collision pour éviter que la caméra traverse les murs
+
+	// Ajoutons ces paramètres pour un comportement plus fluide
+	CameraBoom->bEnableCameraLag = true;            // Ajoute un léger délai pour plus de fluidité
+	CameraBoom->CameraLagSpeed = 10.0f;             // Vitesse de rattrapage de la caméra
+	CameraBoom->CameraRotationLagSpeed = 10.0f;
+
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = true;
+	FollowCamera->bUsePawnControlRotation = false;
 
 }
 
@@ -47,32 +57,43 @@ void AMGG_Mario::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// Commençons par obtenir l'orientation de la caméra
+		const FRotator CameraRotation = CameraBoom->GetComponentRotation();
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		// Nous voulons que le mouvement soit cohérent avec ce que voit le joueur
+		// donc nous utilisons la rotation de la caméra comme base
+		FVector Forward = FRotationMatrix(CameraRotation).GetUnitAxis(EAxis::X);
+		FVector Right = FRotationMatrix(CameraRotation).GetUnitAxis(EAxis::Y);
 
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// La direction "up" est l'opposé de la gravité
+		FVector Up = -GravityVector.GetSafeNormal();
 
-		Velocity += (ForwardDirection * MovementVector.Y) + (RightDirection * MovementVector.X);
+		// Projetons les vecteurs de mouvement sur le plan tangent à la surface
+		// mais en préservant leur orientation relative à la caméra
+		Forward = FVector::VectorPlaneProject(Forward, Up).GetSafeNormal();
+		Right = FVector::VectorPlaneProject(Right, Up).GetSafeNormal();
+
+
+		// Appliquons le mouvement en utilisant les inputs
+		// Y positif = avant, Y négatif = arrière
+		// X positif = droite, X négatif = gauche
+		FVector DesiredMovement = Forward * MovementVector.Y + Right * MovementVector.X;
+		DesiredMovement.Normalize();
+		Velocity += DesiredMovement;
 	}
 }
 
 void AMGG_Mario::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
+
+	CameraYaw += LookAxisVector.X;
+	CameraPitch = FMath::Clamp(CameraPitch + LookAxisVector.Y, -80.0f, 80.0f);
 }
+
+
+
 
 void AMGG_Mario::Jump()
 {
@@ -83,9 +104,68 @@ void AMGG_Mario::StopJumping()
 {
 }
 
+void AMGG_Mario::RotatingMario()
+{
+	FVector NG = GravityVector;
+	NG.Normalize();
+
+	//Check the reference of the Vector
+	FVector temp = FVector(1, 0, 0);
+	if (FVector::DotProduct(NG, temp) > 0.99) { temp = FVector(0, 1, 0); }
+
+	FVector VR = FVector::CrossProduct(NG, temp);
+	VR.Normalize();
+	VR = FVector::CrossProduct(NG, VR);
+	VR.Normalize();
+
+	FVector PointDepart = GetActorLocation();
+
+
+	FVector PlaneNormal = -NG.GetSafeNormal();
+
+	//Debug Forward Vector in Yellow
+	{
+		DrawDebugLine(
+			GetWorld(),
+			PointDepart,
+			PointDepart + GetActorForwardVector() * 100.f,
+			FColor::Yellow,
+			false,
+			.1f,
+			0,
+			1.0f
+		);
+	}
+	//Debug Up Vector in Black
+	{
+		DrawDebugLine(
+			GetWorld(),
+			PointDepart,
+			PointDepart + GetActorUpVector() * 100.f,
+			FColor::Black,
+			false,
+			.1f,
+			0,
+			1.0f
+		);
+	}
+
+
+	FVector DefaultUp = FVector(0, 0, 1);
+	FQuat AlignementRotation = FQuat::FindBetweenVectors(DefaultUp, PlaneNormal);
+
+	FRotator NewRotation = AlignementRotation.Rotator();
+	SetActorRotation(NewRotation);
+
+	FQuat RCamera = FQuat::MakeFromRotator(FRotator(CameraPitch, CameraYaw, 0));
+	
+	CameraBoom->SetRelativeRotation(RCamera);
+}
+
 void AMGG_Mario::Tick(float DeltaTime)
 {
 	PhysicProcess(DeltaTime);
+	UpdateCameraOrientation();
 	Super::Tick(DeltaTime);
 }
 
@@ -98,8 +178,9 @@ void AMGG_Mario::PhysicProcess(float DeltaTime)
 	FVector PointDepart = GetActorLocation();
 
 	// Point d'arriv�e (direction vers l'avant * distance)
-	FVector Direction = GetActorUpVector();
-	FVector PointArrivee = PointDepart + (-1* Direction * 31.0f);
+	FVector Direction = GravityVector;
+	Direction.Normalize();
+	FVector PointArrivee = PointDepart + (Direction * 31.0f);
 
 	// Configuration du raycast
 	FHitResult ResultatHit;
@@ -136,7 +217,12 @@ void AMGG_Mario::PhysicProcess(float DeltaTime)
 	FVector NewLocation = GetActorLocation() + (Velocity * DeltaTime * Speed) + (GravityVector * DeltaTime * UsingGravity);
 	Velocity = FVector(0);
 	SetActorLocation(NewLocation, true);
+	RotatingMario();
+	
+
+
 }
+
 
 void AMGG_Mario::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

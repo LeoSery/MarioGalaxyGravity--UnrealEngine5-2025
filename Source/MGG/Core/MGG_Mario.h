@@ -65,6 +65,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* MeshComponent;
 
+	UPROPERTY()
+	float CameraYaw = 0.0f;
+
+	UPROPERTY()
+	float CameraPitch = 0.0f;
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -76,5 +82,11 @@ protected:
 	void Jump();
 
 	void StopJumping();
+
+	void RotatingMario();
+
+	void UpdateCameraOrientation();
+
+
 
 };
