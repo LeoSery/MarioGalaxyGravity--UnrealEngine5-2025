@@ -16,6 +16,7 @@ void ASpherePlanet::BeginPlay()
 	if (SphereGravityField)
 	{
 		SphereGravityField->UpdateFieldDimensions();
+		SphereGravityField->RedrawDebugField();
 	}
 }
 

@@ -16,6 +16,7 @@ void APlanePlanet::BeginPlay()
 	if (PlaneGravityField)
 	{
 		PlaneGravityField->UpdateFieldDimensions();
+		PlaneGravityField->RedrawDebugField();
 	}
 }
 

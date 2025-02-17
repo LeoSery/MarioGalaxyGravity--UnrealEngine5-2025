@@ -13,8 +13,8 @@ USphereGravityFieldComponent::USphereGravityFieldComponent()
 
 	if (SphereVolume)
 	{
-		SphereVolume->SetHiddenInGame(false);  // Visible en jeu
-		SphereVolume->SetVisibility(true);     // Visible dans l'éditeur
+		SphereVolume->SetHiddenInGame(false);
+		SphereVolume->SetVisibility(true);
 	}
 
 	GravityVolume->OnComponentBeginOverlap.AddDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap);

@@ -16,6 +16,7 @@ void ACubicPlanet::BeginPlay()
 	if (CubeGravityField)
 	{
 		CubeGravityField->UpdateFieldDimensions();
+		CubeGravityField->RedrawDebugField();
 	}
 }
 

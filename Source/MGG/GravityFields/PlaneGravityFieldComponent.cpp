@@ -11,11 +11,11 @@ UPlaneGravityFieldComponent::UPlaneGravityFieldComponent()
 	GravityVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GravityVolume->SetGenerateOverlapEvents(true);
 
-	// if (BoxVolume)
-	// {
-	// 	BoxVolume->SetHiddenInGame(true);
-	// 	BoxVolume->SetVisibility(false);
-	// }
+	if (BoxVolume)
+	{
+		BoxVolume->SetHiddenInGame(false);
+		BoxVolume->SetVisibility(true);
+	}
 	
 	BoxVolume->SetBoxExtent(FVector(1000.0f, 1000.0f, 500.0f));
 
