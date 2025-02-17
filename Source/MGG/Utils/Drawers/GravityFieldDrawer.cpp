@@ -1,5 +1,6 @@
 ﻿#include "GravityFieldDrawer.h"
 #include "Components/LineBatchComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 GravityFieldDrawer::GravityFieldDrawer(ULineBatchComponent* InDebugLines) : DebugLines(InDebugLines)
 {
@@ -145,76 +146,16 @@ void GravityFieldDrawer::DrawTorus(const FVector& Center, float TorusRadius, flo
     }
 }
 
-void GravityFieldDrawer::DrawPlane(const FVector& Center, const FVector& Normal, float Size, const FColor& Color)
+void GravityFieldDrawer::DrawPlane(const FVector& Center, const FVector& Normal, const FRotator& Rotation, float Size, float Height, const FColor& Color)
 {
-    FVector AxisX, AxisY;
-    Normal.FindBestAxisVectors(AxisX, AxisY);
+	FRotationMatrix RotationMatrix(Rotation);
+	FVector AxisX = RotationMatrix.GetScaledAxis(EAxis::X);
+	FVector AxisY = RotationMatrix.GetScaledAxis(EAxis::Y);
     
-    const int32 NumLines = 10;
-    const float Step = Size / float(NumLines);
-    const float Height = Size;
-	
-    FVector VolumeCenter = Center;
-    FVector GridCenter = Center - (Normal * (Height * 0.5f));
+	const int32 NumLines = 10;
+	const float Step = Size / float(NumLines);
     
-    // Dessine la grille au sol en utilisant GridCenter
-    for(int32 i = -NumLines/2; i <= NumLines/2; i++)
-    {
-        DrawLine(
-            GridCenter + AxisX * Size * 0.5f + AxisY * (Step * i),
-            GridCenter - AxisX * Size * 0.5f + AxisY * (Step * i),
-            Color
-        );
-        
-        DrawLine(
-            GridCenter + AxisY * Size * 0.5f + AxisX * (Step * i),
-            GridCenter - AxisY * Size * 0.5f + AxisX * (Step * i),
-            Color
-        );
-    }
-	
-    FVector TopCenter = VolumeCenter + Normal * (Height * 0.5f);
-    FVector BottomCenter = VolumeCenter - Normal * (Height * 0.5f);
-    
-    // Lignes verticales aux coins
-    DrawLine(BottomCenter + AxisX * Size * 0.5f + AxisY * Size * 0.5f, 
-             TopCenter + AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
-             
-    DrawLine(BottomCenter + AxisX * Size * 0.5f - AxisY * Size * 0.5f,
-             TopCenter + AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
-             
-    DrawLine(BottomCenter - AxisX * Size * 0.5f + AxisY * Size * 0.5f,
-             TopCenter - AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
-             
-    DrawLine(BottomCenter - AxisX * Size * 0.5f - AxisY * Size * 0.5f,
-             TopCenter - AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
-    
-    // Lignes du carré du haut
-    DrawLine(TopCenter + AxisX * Size * 0.5f + AxisY * Size * 0.5f,
-             TopCenter + AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
-             
-    DrawLine(TopCenter + AxisX * Size * 0.5f - AxisY * Size * 0.5f,
-             TopCenter - AxisX * Size * 0.5f - AxisY * Size * 0.5f, Color);
-             
-    DrawLine(TopCenter - AxisX * Size * 0.5f - AxisY * Size * 0.5f,
-             TopCenter - AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
-             
-    DrawLine(TopCenter - AxisX * Size * 0.5f + AxisY * Size * 0.5f,
-             TopCenter + AxisX * Size * 0.5f + AxisY * Size * 0.5f, Color);
-
-    // Draw normal arrow au centre du volume
-	DrawLine(GridCenter, GridCenter + Normal * (Size * 0.2f), FColor::Red);
-}
-
-void GravityFieldDrawer::DrawPlane(const FVector& Center, const FVector& Normal, float Size, float Height, const FColor& Color)
-{
-	FVector AxisX, AxisY;
-    Normal.FindBestAxisVectors(AxisX, AxisY);
-    
-    const int32 NumLines = 10;
-    const float Step = Size / float(NumLines);
-	
-    FVector VolumeBase = Center;
+	FVector VolumeBase = Center;
 	
     for(int32 i = -NumLines/2; i <= NumLines/2; i++)
     {

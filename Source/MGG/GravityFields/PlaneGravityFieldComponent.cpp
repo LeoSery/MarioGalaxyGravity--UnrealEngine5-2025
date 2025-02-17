@@ -29,7 +29,8 @@ void UPlaneGravityFieldComponent::DrawDebugGravityField()
 	{
 		currentDrawer->DrawPlane(
 			CurrentDimensions.Center,
-			GetUpVector(), 
+			GetUpVector(),
+			GetComponentRotation(),
 			CurrentDimensions.Size.X,
 			CurrentDimensions.Size.Z,
 			FColor::Orange
