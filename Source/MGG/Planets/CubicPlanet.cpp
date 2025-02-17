@@ -13,10 +13,10 @@ void ACubicPlanet::BeginPlay()
 	Super::BeginPlay();
 	SyncGravityFieldSettings();
 
-	// if (CubeGravityField)
-	// {
-	// 	CubeGravityField->UpdateFieldDimensions();
-	// }
+	if (CubeGravityField)
+	{
+		CubeGravityField->UpdateFieldDimensions();
+	}
 }
 
 void ACubicPlanet::OnConstruction(const FTransform& Transform)

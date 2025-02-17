@@ -10,12 +10,12 @@ USphereGravityFieldComponent::USphereGravityFieldComponent()
 	GravityVolume->SetCollisionProfileName(TEXT("OverlapAll"));
 	GravityVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GravityVolume->SetGenerateOverlapEvents(true);
-	
-	// if (SphereVolume)
-	// {
-	// 	SphereVolume->SetHiddenInGame(true);
-	// 	SphereVolume->SetVisibility(false);
-	// }
+
+	if (SphereVolume)
+	{
+		SphereVolume->SetHiddenInGame(false);  // Visible en jeu
+		SphereVolume->SetVisibility(true);     // Visible dans l'éditeur
+	}
 
 	GravityVolume->OnComponentBeginOverlap.AddDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap);
 	GravityVolume->OnComponentEndOverlap.AddDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeEndOverlap);

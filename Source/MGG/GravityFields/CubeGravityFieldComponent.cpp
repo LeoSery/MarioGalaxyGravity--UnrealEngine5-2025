@@ -10,12 +10,12 @@ UCubeGravityFieldComponent::UCubeGravityFieldComponent()
 	GravityVolume->SetCollisionProfileName(TEXT("OverlapAll"));
 	GravityVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GravityVolume->SetGenerateOverlapEvents(true);
-
-	// if (CubeVolume)
-	// {
-	// 	CubeVolume->SetHiddenInGame(true);
-	// 	CubeVolume->SetVisibility(false);
-	// }
+	
+	if (CubeVolume)
+	{
+		CubeVolume->SetHiddenInGame(false);
+		CubeVolume->SetVisibility(true);
+	}
 	
 	CubeVolume->SetBoxExtent(FVector(GetTotalGravityRadius()));
 
@@ -41,16 +41,22 @@ FVector UCubeGravityFieldComponent::CalculateGravityVector(const FVector& Target
 {
 	FVector RelativePosition = TargetLocation - CurrentDimensions.Center;
 
+	UE_LOG(LogTemp, Warning, TEXT("Target Location: %s"), *TargetLocation.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Center: %s"), *CurrentDimensions.Center.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Relative Position: %s"), *RelativePosition.ToString());
+
 	FVector MeshSize;
 	if (AActor* Owner = GetOwner())
 	{
 		if (UStaticMeshComponent* MeshComp = Owner->FindComponentByClass<UStaticMeshComponent>())
 		{
 			MeshSize = MeshComp->Bounds.BoxExtent;
+			UE_LOG(LogTemp, Warning, TEXT("Mesh Size: %s"), *MeshSize.ToString());
 		}
 	}
 	
 	FCubePositionFlags Flags = CalculatePositionFlags(RelativePosition, MeshSize);
+	UE_LOG(LogTemp, Warning, TEXT("Flags - X: %d, Y: %d, Z: %d"), Flags.X, Flags.Y, Flags.Z);
 	
 	int32 OutsideAxesCount = (Flags.X != FCubePositionFlags::Inside ? 1 : 0) + (Flags.Y != FCubePositionFlags::Inside ? 1 : 0) + (Flags.Z != FCubePositionFlags::Inside ? 1 : 0);
     
