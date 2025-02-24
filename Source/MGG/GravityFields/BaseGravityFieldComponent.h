@@ -38,6 +38,8 @@ public:
 
 	UFUNCTION()
 	void OnGravityVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	bool IsActorInGravityField(AActor* Actor) const;
 	
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bShowDebugField = true;

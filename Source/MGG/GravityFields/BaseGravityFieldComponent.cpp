@@ -70,6 +70,15 @@ void UBaseGravityFieldComponent::OnGravityVolumeEndOverlap(UPrimitiveComponent* 
 	}
 }
 
+bool UBaseGravityFieldComponent::IsActorInGravityField(AActor* Actor) const
+{
+	if (GravityVolume && Actor)
+	{
+		return GravityVolume->IsOverlappingActor(Actor);
+	}
+	return false;
+}
+
 float UBaseGravityFieldComponent::GetTotalGravityRadius() const
 {
 	if (AActor* Owner = GetOwner())

@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 #include "MGG/GravityFields/BaseGravityFieldComponent.h"
 
 AMGG_Mario::AMGG_Mario()
@@ -47,6 +48,24 @@ void AMGG_Mario::BeginPlay()
 {
 	Super::BeginPlay();
 	GravityVector = FVector(0, 0, -980.0f);  // default gravity
+
+	TArray<UBaseGravityFieldComponent*> GravityFields;
+	TArray<AActor*> AllActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), AllActors);
+
+	for (AActor* Actor : AllActors)
+	{
+		if (UBaseGravityFieldComponent* GravityField = Actor->FindComponentByClass<UBaseGravityFieldComponent>())
+		{
+			if (GravityField->IsActorInGravityField(this))
+			{
+				CurrentGravityField = GravityField;
+				bIsInGravityField = true;
+				GravityVector = GravityField->CalculateGravityVector(GetActorLocation());
+				break; // only one field yet 
+			}
+		}
+	}
 }
 
 void AMGG_Mario::Move(const FInputActionValue& Value)
