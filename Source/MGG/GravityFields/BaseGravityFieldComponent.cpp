@@ -46,13 +46,12 @@ void UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap(UPrimitiveComponent
 	
 	if (OtherActor && OtherActor->Implements<UGravityAffected>())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("The actor implements the IGravityAffected interface"));
 		if (IGravityAffected* AffectedActor = Cast<IGravityAffected>(OtherActor))
 		{
-			AffectedActor->CurrentGravityField = this;
-			
-			FVector GravityVector = CalculateGravityVector(OtherActor->GetActorLocation());
-			UE_LOG(LogTemp, Warning, TEXT("Applied gravity vector : %s"), *GravityVector.ToString());
+			AffectedActor->GravityFields.Add(this);
+			UBaseGravityFieldComponent* NewActiveField = AffectedActor->GetActiveGravityField();
+
+			FVector GravityVector = NewActiveField->CalculateGravityVector(OtherActor->GetActorLocation());
 			IGravityAffected::Execute_OnEnterGravityField(OtherActor, GravityVector);
 		}
 	}
@@ -64,8 +63,28 @@ void UBaseGravityFieldComponent::OnGravityVolumeEndOverlap(UPrimitiveComponent* 
 	{
 		if (IGravityAffected* AffectedActor = Cast<IGravityAffected>(OtherActor))
 		{
-			AffectedActor->CurrentGravityField = nullptr;
-			IGravityAffected::Execute_OnExitGravityField(OtherActor);
+			bool wasActiveField = false;
+		
+			if (AffectedActor->GetActiveGravityField() == this)
+			{
+				wasActiveField = true;
+			}
+			
+			AffectedActor->GravityFields.Remove(this);
+    
+			if (wasActiveField)
+			{
+				if (AffectedActor->GravityFields.Num() > 0)
+				{
+					UBaseGravityFieldComponent* NewActiveField = AffectedActor->GetActiveGravityField();
+					FVector GravityVector = NewActiveField->CalculateGravityVector(OtherActor->GetActorLocation());
+					IGravityAffected::Execute_OnEnterGravityField(OtherActor, GravityVector);
+				}
+				else
+				{
+					IGravityAffected::Execute_OnExitGravityField(OtherActor);
+				}
+			}
 		}
 	}
 }

@@ -48,22 +48,28 @@ void AMGG_Mario::BeginPlay()
 {
 	Super::BeginPlay();
 	GravityVector = FVector(0, 0, -980.0f);  // default gravity
-
-	TArray<UBaseGravityFieldComponent*> GravityFields;
+	
 	TArray<AActor*> AllActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), AllActors);
 
-	for (AActor* Actor : AllActors)
+	for (const AActor* Actor : AllActors)
 	{
 		if (UBaseGravityFieldComponent* GravityField = Actor->FindComponentByClass<UBaseGravityFieldComponent>())
 		{
 			if (GravityField->IsActorInGravityField(this))
 			{
-				CurrentGravityField = GravityField;
-				bIsInGravityField = true;
-				GravityVector = GravityField->CalculateGravityVector(GetActorLocation());
-				break; // only one field yet 
+				GravityFields.Add(GravityField);
 			}
+		}
+	}
+	
+	if (GravityFields.Num() > 0)
+	{
+		bIsInGravityField = true;
+
+		if (UBaseGravityFieldComponent* ActiveField = GetActiveGravityField())
+		{
+			GravityVector = ActiveField->CalculateGravityVector(GetActorLocation());
 		}
 	}
 }
@@ -269,8 +275,14 @@ void AMGG_Mario::OnExitGravityField_Implementation()
 
 void AMGG_Mario::UpdateCurrentGravityField()
 {
-	if (CurrentGravityField)
+	UBaseGravityFieldComponent* ActiveField = GetActiveGravityField();
+	
+	if (ActiveField)
 	{
-		GravityVector = CurrentGravityField->CalculateGravityVector(GetActorLocation());
+		GravityVector = ActiveField->CalculateGravityVector(GetActorLocation());
+	}
+	else
+	{
+		// No gravity field found, reset gravity to default
 	}
 }

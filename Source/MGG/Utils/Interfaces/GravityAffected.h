@@ -28,5 +28,6 @@ public:
 	void OnExitGravityField();
 	virtual void OnExitGravityField_Implementation() = 0;
 	
-	UBaseGravityFieldComponent* CurrentGravityField = nullptr;
+	TArray<UBaseGravityFieldComponent*> GravityFields;
+	UBaseGravityFieldComponent* GetActiveGravityField();
 };
