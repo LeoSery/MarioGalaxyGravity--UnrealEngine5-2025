@@ -110,40 +110,40 @@ void UCubeGravityFieldComponent::UpdateGravityVolume()
 UCubeGravityFieldComponent::FCubePositionFlags UCubeGravityFieldComponent::CalculatePositionFlags(const FVector& RelativePosition, const FVector& Extent) const
 {
 	FCubePositionFlags Flags = {FCubePositionFlags::Inside, FCubePositionFlags::Inside, FCubePositionFlags::Inside};
-	
-	if (RelativePosition.X < -Extent.X)
+    
+	if (RelativePosition.X <= -Extent.X)
 	{
 		Flags.X = FCubePositionFlags::Behind;
 	}
-	else if (RelativePosition.X > Extent.X)
+	else if (RelativePosition.X >= Extent.X)
 	{
 		Flags.X = FCubePositionFlags::Forward;
 	}
     
-	if (RelativePosition.Y < -Extent.Y)
+	if (RelativePosition.Y <= -Extent.Y)
 	{
 		Flags.Y = FCubePositionFlags::Behind;
 	}
-	else if (RelativePosition.Y > Extent.Y)
+	else if (RelativePosition.Y >= Extent.Y)
 	{
 		Flags.Y = FCubePositionFlags::Forward;
 	}
     
-	if (RelativePosition.Z < -Extent.Z)
+	if (RelativePosition.Z <= -Extent.Z)
 	{
 		Flags.Z = FCubePositionFlags::Behind;
 	}
-	else if (RelativePosition.Z > Extent.Z)
+	else if (RelativePosition.Z >= Extent.Z)
 	{
 		Flags.Z = FCubePositionFlags::Forward;
 	}
-
+    
 	return Flags;
 }
 
 FVector UCubeGravityFieldComponent::CalculateBlendFactors(const FVector& RelativePosition, const FVector& Extent, const FCubePositionFlags& Flags) const
 {
-	const float EdgeBlendDistance = Extent.X * 0.1f;
+	const float EdgeBlendDistance = Extent.X * 0.0001f;
     
 	FVector BlendFactors;
 	
