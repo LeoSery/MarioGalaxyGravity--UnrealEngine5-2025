@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "BasePlanet.h"
 #include "MGG/GravityFields/TorusGravityFieldComponent.h"
+#include "MGG/Utils/MeshGenerator/TorusMeshComponent.h"
 #include "TorusPlanet.generated.h"
 
 UCLASS()
@@ -12,7 +13,6 @@ class MGG_API ATorusPlanet : public ABasePlanet
 
 public:
 	ATorusPlanet();
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
@@ -21,4 +21,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UTorusGravityFieldComponent* TorusGravityField;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UTorusMeshComponent* TorusMesh;
 };

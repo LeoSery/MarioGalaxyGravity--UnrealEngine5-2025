@@ -20,7 +20,6 @@ AMGG_Mario::AMGG_Mario()
 	if (SphereMeshAsset.Succeeded())
 	{
 		MeshComponent->SetStaticMesh(SphereMeshAsset.Object);
-		MeshComponent->SetWorldScale3D(FVector(0.5f));
 	}
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -41,7 +40,6 @@ AMGG_Mario::AMGG_Mario()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false;
-
 }
 
 void AMGG_Mario::BeginPlay()
