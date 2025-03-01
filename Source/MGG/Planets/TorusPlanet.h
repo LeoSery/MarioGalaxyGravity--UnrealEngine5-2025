@@ -14,6 +14,7 @@ class MGG_API ATorusPlanet : public ABasePlanet
 public:
 	ATorusPlanet();
 	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -23,4 +24,18 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UTorusMeshComponent* TorusMesh;
+	
+	UPROPERTY(EditAnywhere, Category = "Planet Settings|Procedural Mesh", meta = (DisplayName = "Torus Radius"))
+	float TorusRadius = 100.0f;
+    
+	UPROPERTY(EditAnywhere, Category = "Planet Settings|Procedural Mesh", meta = (DisplayName = "Tube Radius"))
+	float TubeRadius = 25.0f;
+    
+	UPROPERTY(EditAnywhere, Category = "Planet Settings|Procedural Mesh", meta = (DisplayName = "Torus Segments", ClampMin = "4", ClampMax = "64"))
+	int32 TorusSegments = 16;
+    
+	UPROPERTY(EditAnywhere, Category = "Planet Settings|Procedural Mesh", meta = (DisplayName = "Tube Segments", ClampMin = "3", ClampMax = "32"))
+	int32 TubeSegments = 8;
+	
+	void SyncTorusMeshSettings();
 };

@@ -18,5 +18,5 @@ protected:
 	virtual FGravityFieldDimensions CalculateFieldDimensions() const override;
 	virtual void UpdateGravityVolume() override;
 
-	FORCEINLINE virtual bool RequiresConstantGravityUpdate() const override { return false; } // temporary set to false until the torus gravity field is implemented
+	FORCEINLINE virtual bool RequiresConstantGravityUpdate() const override { return true; }
 };

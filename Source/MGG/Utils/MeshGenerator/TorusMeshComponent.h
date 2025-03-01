@@ -12,16 +12,16 @@ class MGG_API UTorusMeshComponent : public UProceduralMeshComponent
 public:
 	UTorusMeshComponent(const FObjectInitializer& ObjectInitializer);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh Settings")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh Settings")
 	float TorusRadius = 200.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh Settings")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh Settings")
 	float TubeRadius = 50.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh Settings", meta = (ClampMin = "4", ClampMax = "64"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh Settings", meta = (ClampMin = "4", ClampMax = "64"))
 	int32 TorusSegments = 16;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh Settings", meta = (ClampMin = "3", ClampMax = "32"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh Settings", meta = (ClampMin = "3", ClampMax = "32"))
 	int32 TubeSegments = 8;
 	
 	UFUNCTION(Category = "Mesh Settings")

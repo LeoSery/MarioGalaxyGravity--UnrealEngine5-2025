@@ -6,10 +6,7 @@ ATorusPlanet::ATorusPlanet()
 
 	TorusMesh = CreateDefaultSubobject<UTorusMeshComponent>(TEXT("TorusMesh"));
 	TorusMesh->SetupAttachment(RootComponent);
-
-	TorusMesh->TorusRadius = 300.0f;
-	TorusMesh->TubeRadius = 50.0f;
-
+	
 	TorusGravityField = CreateDefaultSubobject<UTorusGravityFieldComponent>(TEXT("TorusGravityField"));
 	TorusGravityField->SetupAttachment(RootComponent);
 
@@ -20,6 +17,7 @@ ATorusPlanet::ATorusPlanet()
 void ATorusPlanet::BeginPlay()
 {
 	Super::BeginPlay();
+	SyncTorusMeshSettings();
 	SyncGravityFieldSettings();
 
 	if (TorusMesh)
@@ -34,9 +32,22 @@ void ATorusPlanet::BeginPlay()
 	}
 }
 
+void ATorusPlanet::SyncTorusMeshSettings()
+{
+	if (TorusMesh)
+	{
+		TorusMesh->TorusRadius = TorusRadius;
+		TorusMesh->TubeRadius = TubeRadius;
+		TorusMesh->TorusSegments = TorusSegments;
+		TorusMesh->TubeSegments = TubeSegments;
+		TorusMesh->GenerateTorusMesh();
+	}
+}
+
 void ATorusPlanet::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+	SyncTorusMeshSettings();
 	SyncGravityFieldSettings();
 
 	if (TorusMesh)
@@ -48,5 +59,26 @@ void ATorusPlanet::OnConstruction(const FTransform& Transform)
 	{
 		TorusGravityField->UpdateFieldDimensions();
 		TorusGravityField->RedrawDebugField();
+	}
+}
+
+void ATorusPlanet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+    
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(ATorusPlanet, TorusRadius) ||
+		PropertyName == GET_MEMBER_NAME_CHECKED(ATorusPlanet, TubeRadius) ||
+		PropertyName == GET_MEMBER_NAME_CHECKED(ATorusPlanet, TorusSegments) ||
+		PropertyName == GET_MEMBER_NAME_CHECKED(ATorusPlanet, TubeSegments))
+	{
+		SyncTorusMeshSettings();
+		
+		if (TorusGravityField)
+		{
+			TorusGravityField->UpdateFieldDimensions();
+			TorusGravityField->RedrawDebugField();
+		}
 	}
 }
