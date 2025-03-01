@@ -19,4 +19,7 @@ protected:
 	virtual void UpdateGravityVolume() override;
 
 	FORCEINLINE virtual bool RequiresConstantGravityUpdate() const override { return true; }
+
+private:
+	float GetTorusScaleFactor() const;
 };

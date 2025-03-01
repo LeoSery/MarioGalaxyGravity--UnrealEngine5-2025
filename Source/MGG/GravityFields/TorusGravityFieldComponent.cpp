@@ -1,11 +1,15 @@
 ﻿#include "TorusGravityFieldComponent.h"
 
+#include "EngineUtils.h"
 #include "Components/SphereComponent.h"
 #include "MGG/Planets/BasePlanet.h"
+#include "MGG/Utils/Interfaces/GravityAffected.h"
 #include "MGG/Utils/MeshGenerator/TorusMeshComponent.h"
 
 UTorusGravityFieldComponent::UTorusGravityFieldComponent()
 {
+	PrimaryComponentTick.bCanEverTick = true;
+	
 	USphereComponent* SphereVolume = CreateDefaultSubobject<USphereComponent>(TEXT("GravityVolume"));
 	GravityVolume = SphereVolume;
 	GravityVolume->SetupAttachment(this);
@@ -26,102 +30,72 @@ UTorusGravityFieldComponent::UTorusGravityFieldComponent()
 
 void UTorusGravityFieldComponent::DrawDebugGravityField()
 {
-	if (bShowDebugField && currentDrawer)
-	{
-		// Obtenez les dimensions du tore depuis le TorusMeshComponent
-		float TorusRadius = CurrentDimensions.Size.X * 0.5f;  // Une estimation
-		float TubeRadius = TorusRadius * 0.2f;                // Une estimation
-        
-		if (AActor* Owner = GetOwner())
-		{
-			if (UTorusMeshComponent* TorusMesh = Owner->FindComponentByClass<UTorusMeshComponent>())
-			{
-				TorusRadius = TorusMesh->TorusRadius;
-				TubeRadius = TorusMesh->TubeRadius;
-			}
-		}
-        
-		currentDrawer->DrawTorus(GetComponentLocation(), TorusRadius, TubeRadius, 32, FColor::Red);
-	}
+	// if (bShowDebugField && currentDrawer && GetOwner())
+	// {
+	// 	UTorusMeshComponent* TorusMesh = GetOwner()->FindComponentByClass<UTorusMeshComponent>();
+	// 	if (TorusMesh)
+	// 	{
+	// 		float TorusRadius = TorusMesh->TorusRadius;
+	// 		float TubeRadius = TorusMesh->TubeRadius;
+	// 		
+	// 		float ScaleFactor = GetTorusScaleFactor();
+	// 		
+	// 		TorusRadius *= ScaleFactor;
+	// 		TubeRadius *= ScaleFactor;
+ //            
+	// 		currentDrawer->DrawTorus(GetComponentLocation(), TorusRadius, TubeRadius, 32, FColor::Red);
+	// 	}
+	// }
 }
 
 FVector UTorusGravityFieldComponent::CalculateGravityVector(const FVector& TargetLocation) const
 {
-	if (AActor* Owner = GetOwner())
-	{
-		UTorusMeshComponent* TorusMesh = Owner->FindComponentByClass<UTorusMeshComponent>();
-		if (TorusMesh)
-		{
-			// Position relative au centre du tore
-			FVector LocalPosition = TargetLocation - GetComponentLocation();
+    if (AActor* Owner = GetOwner())
+    {
+	    if (UTorusMeshComponent* TorusMesh = Owner->FindComponentByClass<UTorusMeshComponent>())
+        {
+            FVector TorusCenter = GetComponentLocation();
+	    	
+            FVector gu = FVector(0, 0, 1);
+            FVector gr = FVector(1, 0, 0);
+	    	
+            float BaseRadius = TorusMesh->TorusRadius;
+            float ScaledRadius = BaseRadius * GetTorusScaleFactor();
+	    	
+            FVector V = (TargetLocation - TorusCenter).GetSafeNormal();
+	    	
+            float dotProduct = FVector::DotProduct(V, gr);
+            dotProduct = FMath::Clamp(dotProduct, -1.0f, 1.0f);
+            float angle = FMath::Acos(dotProduct);
+            float sign = FMath::Sign(FVector::DotProduct(FVector::CrossProduct(V, gr), gu));
+	    	
+            FVector rotatedGr = gr.RotateAngleAxis(angle * sign * 180.0f / PI, gu);
+            FVector P = TorusCenter + rotatedGr * ScaledRadius;
+            FVector GravityDirection = (P - TargetLocation).GetSafeNormal();
             
-			// Projetez la position sur le plan XY
-			FVector ProjectedPosition = FVector(LocalPosition.X, LocalPosition.Y, 0);
-			float DistanceFromCenter = ProjectedPosition.Size();
-            
-			// Direction vers l'anneau principal
-			FVector DirectionToRing;
-            
-			if (DistanceFromCenter < 0.001f)  // Si presque au centre
-			{
-				// Choisissez une direction arbitraire dans le plan XY
-				DirectionToRing = FVector(1, 0, 0);
-			}
-			else
-			{
-				// Normalisez pour obtenir la direction vers/depuis l'anneau
-				DirectionToRing = ProjectedPosition / DistanceFromCenter;
-			}
-            
-			// Distance idéale = rayon du tore
-			float IdealDistance = TorusMesh->TorusRadius;
-            
-			// Composante dans le plan XY (vers l'anneau)
-			FVector GravityXY = DirectionToRing * (DistanceFromCenter - IdealDistance);
-            
-			// Composante en Z (vers le plan XY)
-			FVector GravityZ = FVector(0, 0, -LocalPosition.Z);
-            
-			// Combine les deux composantes
-			FVector GravityDirection = (GravityXY + GravityZ).GetSafeNormal();
-            
-			return GravityDirection * GravityStrength;
-		}
-	}
-    
-	// Fallback vers une gravité standard vers le bas
-	return FVector(0, 0, -1) * GravityStrength;
+            return GravityDirection * GravityStrength;
+        }
+    }
+	
+    return FVector(0, 0, -1) * GravityStrength;
 }
 
 UBaseGravityFieldComponent::FGravityFieldDimensions UTorusGravityFieldComponent::CalculateFieldDimensions() const
 {
 	FGravityFieldDimensions Dimensions;
-    
-	// Valeurs par défaut
+	
 	float meshRadiusBase = 0.0f;
-	float scaleFactor = 1.0f;
+	float scaleFactor = GetTorusScaleFactor();
     
 	if (AActor* Owner = GetOwner())
 	{
-		// Récupérer le facteur d'échelle basé sur PlanetRadius
-		if (ABasePlanet* Planet = Cast<ABasePlanet>(Owner))
+		if (UTorusMeshComponent* TorusMesh = Owner->FindComponentByClass<UTorusMeshComponent>())
 		{
-			scaleFactor = Planet->PlanetRadius / 100.0f;
-		}
-        
-		// Récupérer les dimensions du tore
-		UTorusMeshComponent* TorusMesh = Owner->FindComponentByClass<UTorusMeshComponent>();
-		if (TorusMesh)
-		{
-			// Rayon de base du tore (sans mise à l'échelle)
 			meshRadiusBase = TorusMesh->TorusRadius + TorusMesh->TubeRadius;
 		}
 	}
-    
-	// Rayon réel après mise à l'échelle
+	
 	float actualMeshRadius = meshRadiusBase * scaleFactor;
-    
-	// Ajouter l'InfluenceRange
 	float totalRadius = actualMeshRadius + GravityInfluenceRange;
     
 	Dimensions.Size = FVector(totalRadius);
@@ -134,7 +108,35 @@ void UTorusGravityFieldComponent::UpdateGravityVolume()
 {
 	if (USphereComponent* SphereVolume = Cast<USphereComponent>(GravityVolume))
 	{
-		SphereVolume->SetSphereRadius(CurrentDimensions.Size.X);
-		SphereVolume->SetWorldLocation(CurrentDimensions.Center);
+		if (AActor* Owner = GetOwner())
+		{
+			if (UTorusMeshComponent* TorusMesh = Owner->FindComponentByClass<UTorusMeshComponent>())
+			{
+				float MainRadius = TorusMesh->TorusRadius;
+				float TubeRadius = TorusMesh->TubeRadius;
+				float TotalRadius = (MainRadius + TubeRadius) * GetTorusScaleFactor() + GravityInfluenceRange;
+                
+				SphereVolume->SetSphereRadius(TotalRadius);
+				SphereVolume->SetWorldLocation(GetComponentLocation());
+			}
+			else
+			{
+				SphereVolume->SetSphereRadius(CurrentDimensions.Size.X);
+				SphereVolume->SetWorldLocation(CurrentDimensions.Center);
+			}
+		}
 	}
+}
+
+float UTorusGravityFieldComponent::GetTorusScaleFactor() const
+{
+	float ScaleFactor = 1.0f;
+	if (AActor* Owner = GetOwner())
+	{
+		if (ABasePlanet* Planet = Cast<ABasePlanet>(Owner))
+		{
+			ScaleFactor = Planet->PlanetRadius / 100.0f;
+		}
+	}
+	return ScaleFactor;
 }
