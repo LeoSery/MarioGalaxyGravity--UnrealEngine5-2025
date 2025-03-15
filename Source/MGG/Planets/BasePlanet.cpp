@@ -23,10 +23,14 @@ ABasePlanet::ABasePlanet()
 
 void ABasePlanet::BeginPlay()
 {
-	if (UBaseGravityFieldComponent* GravityField = GetComponentByClass<UBaseGravityFieldComponent>()) {
-		GravityField->UpdateGravityVolume();
-		GravityField->RedrawDebugField();
+	CachedGravityField = GetComponentByClass<UBaseGravityFieldComponent>();
+	
+	if (CachedGravityField)
+	{
+		CachedGravityField->UpdateGravityVolume();
+		CachedGravityField->RedrawDebugField();
 	}
+	
 	Super::BeginPlay();
 }
 
@@ -100,15 +104,20 @@ void ABasePlanet::PostEditMove(bool bFinished)
 
 void ABasePlanet::SyncGravityFieldSettings()
 {
-	if (UBaseGravityFieldComponent* GravityField = GetComponentByClass<UBaseGravityFieldComponent>())
+	if (!CachedGravityField)
 	{
-		if (GravityField->GetGravityStrength() != GravityStrength)
-			GravityField->SetGravityStrength(GravityStrength);
+		CachedGravityField = GetComponentByClass<UBaseGravityFieldComponent>();
+	}
+	
+	if (CachedGravityField)
+	{
+		if (CachedGravityField->GetGravityStrength() != GravityStrength)
+			CachedGravityField->SetGravityStrength(GravityStrength);
             
-		if (GravityField->GetGravityFieldPriority() != GravityFieldPriority)
-			GravityField->SetGravityFieldPriority(GravityFieldPriority);
+		if (CachedGravityField->GetGravityFieldPriority() != GravityFieldPriority)
+			CachedGravityField->SetGravityFieldPriority(GravityFieldPriority);
             
-		if (GravityField->GetGravityInfluenceRange() != GravityInfluenceRange)
-			GravityField->SetGravityInfluenceRange(GravityInfluenceRange);
+		if (CachedGravityField->GetGravityInfluenceRange() != GravityInfluenceRange)
+			CachedGravityField->SetGravityInfluenceRange(GravityInfluenceRange);
 	}
 }

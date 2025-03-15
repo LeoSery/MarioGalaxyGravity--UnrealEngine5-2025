@@ -41,6 +41,14 @@ void UTorusMeshComponent::GenerateTorusMesh()
     TArray<int32> Triangles;
     TArray<FVector> Normals;
     TArray<FVector2D> UV0;
+
+	const int32 NumVertices = TorusSegments * TubeSegments;
+	const int32 NumTriangles = TorusSegments * TubeSegments * 6;
+
+	Vertices.Reserve(NumVertices);
+	Triangles.Reserve(NumTriangles);
+	Normals.Reserve(NumVertices);
+	UV0.Reserve(NumVertices);
 	
     for (int32 i = 0; i < TorusSegments; i++)
     {

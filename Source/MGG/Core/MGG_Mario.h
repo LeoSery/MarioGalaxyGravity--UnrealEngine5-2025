@@ -10,6 +10,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+
 struct FInputActionValue;
 
 UCLASS()
@@ -40,7 +41,7 @@ public:
 	//IGravityAffected Interface methods
 	virtual void OnEnterGravityField_Implementation(const FVector& NewGravityVector) override;
 	virtual void OnExitGravityField_Implementation() override;
-	virtual FVector& GetGravityVector() override { return GravityVector; }
+	FORCEINLINE virtual FVector& GetGravityVector() override { return GravityVector; }
 	virtual void UpdateCurrentGravityField() override;
 
 	UPROPERTY(BlueprintReadOnly)

@@ -2,6 +2,7 @@
 #include "MGG//Utils/Interfaces/GravityAffected.h"
 #include "Components/LineBatchComponent.h"
 #include "Components/ShapeComponent.h"
+#include "MGG/Utils/Drawers/GravityFieldDrawer.h"
 
 UBaseGravityFieldComponent::UBaseGravityFieldComponent()
 {
@@ -38,12 +39,6 @@ void UBaseGravityFieldComponent::UpdateFieldDimensions()
 
 void UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("-----"));
-	UE_LOG(LogTemp, Warning, TEXT("Begin Overlap - Actor: %s"), *OtherActor->GetName());
-	UE_LOG(LogTemp, Warning, TEXT("Component: %s"), *OtherComp->GetName());
-	UE_LOG(LogTemp, Warning, TEXT("Volume: %s"), *GravityVolume->GetName());
-	UE_LOG(LogTemp, Warning, TEXT("Location: %s"), *OtherActor->GetActorLocation().ToString());
-	
 	if (OtherActor && OtherActor->Implements<UGravityAffected>())
 	{
 		if (IGravityAffected* AffectedActor = Cast<IGravityAffected>(OtherActor))
@@ -89,15 +84,6 @@ void UBaseGravityFieldComponent::OnGravityVolumeEndOverlap(UPrimitiveComponent* 
 	}
 }
 
-bool UBaseGravityFieldComponent::IsActorInGravityField(AActor* Actor) const
-{
-	if (GravityVolume && Actor)
-	{
-		return GravityVolume->IsOverlappingActor(Actor);
-	}
-	return false;
-}
-
 float UBaseGravityFieldComponent::GetTotalGravityRadius() const
 {
 	if (AActor* Owner = GetOwner())
@@ -140,4 +126,14 @@ void UBaseGravityFieldComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 		UpdateFieldDimensions();
 		RedrawDebugField();
 	}
+}
+
+void UBaseGravityFieldComponent::BeginDestroy()
+{
+	if (GravityVolume)
+	{
+		GravityVolume->OnComponentBeginOverlap.RemoveDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeBeginOverlap);
+		GravityVolume->OnComponentEndOverlap.RemoveDynamic(this, &UBaseGravityFieldComponent::OnGravityVolumeEndOverlap);
+	}
+	Super::BeginDestroy();
 }

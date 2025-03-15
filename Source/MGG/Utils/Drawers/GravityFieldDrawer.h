@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-
-class ULineBatchComponent;
+#include "Components/LineBatchComponent.h"
 
 class MGG_API GravityFieldDrawer
 {
@@ -15,7 +14,13 @@ public:
 	void DrawPlane(const FVector& Center, const FVector& Normal, const FRotator& Rotation, float Size, float Height, const FColor& Color);
 
 private:
-	void DrawLine(const FVector& Start, const FVector& End, const FColor& Color);
+	FORCEINLINE void DrawLine(const FVector& Start, const FVector& End, const FColor& Color)
+	{
+		if (DebugLines)
+		{
+			DebugLines->DrawLine(Start, End, Color, 0, 5.0f);
+		}
+	}
     
 	UPROPERTY()
 	ULineBatchComponent* DebugLines;

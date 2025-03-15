@@ -4,6 +4,10 @@
 #include "GameFramework/Actor.h"
 #include "BasePlanet.generated.h"
 
+class UStaticMeshComponent;
+class UStaticMesh;
+class UBaseGravityFieldComponent;
+
 UCLASS(Abstract)
 class MGG_API ABasePlanet : public AActor
 {
@@ -40,6 +44,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Planet settings")
 	UStaticMesh* DefaultMesh;
+
+	UPROPERTY(Transient)
+	UBaseGravityFieldComponent* CachedGravityField;
 
 	virtual void SyncGravityFieldSettings();
 };

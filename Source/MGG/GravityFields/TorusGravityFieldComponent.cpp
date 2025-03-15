@@ -1,9 +1,7 @@
 ﻿#include "TorusGravityFieldComponent.h"
 
-#include "EngineUtils.h"
 #include "Components/SphereComponent.h"
 #include "MGG/Planets/BasePlanet.h"
-#include "MGG/Utils/Interfaces/GravityAffected.h"
 #include "MGG/Utils/MeshGenerator/TorusMeshComponent.h"
 
 UTorusGravityFieldComponent::UTorusGravityFieldComponent()

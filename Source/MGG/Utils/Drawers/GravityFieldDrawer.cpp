@@ -205,11 +205,3 @@ void GravityFieldDrawer::DrawPlane(const FVector& Center, const FVector& Normal,
     // Norml arrow
     DrawLine(VolumeBase, VolumeBase + Normal * (Size * 0.2f), FColor::Red);
 }
-
-void GravityFieldDrawer::DrawLine(const FVector& Start, const FVector& End, const FColor& Color)
-{
-	if (DebugLines)
-	{
-		DebugLines->DrawLine(Start, End, Color, 0, 5.0f);
-	}
-}

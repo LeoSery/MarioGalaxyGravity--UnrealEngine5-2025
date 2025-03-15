@@ -2,8 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "Components/ShapeComponent.h"
 #include "MGG/Utils/Drawers/GravityFieldDrawer.h"
 #include "BaseGravityFieldComponent.generated.h"
+
+class ULineBatchComponent;
+class UShapeComponent;
 
 UCLASS(Abstract, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MGG_API UBaseGravityFieldComponent : public USceneComponent
@@ -15,20 +19,21 @@ public:
 	
 	virtual void OnUpdateTransform(EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport = ETeleportType::None) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void BeginDestroy() override;
 	
 	virtual void DrawDebugGravityField() PURE_VIRTUAL(UBaseGravityFieldComponent::DrawDebugGravityField,);
 
 	// Getters
-	float GetGravityStrength() const { return GravityStrength; }
-	int32 GetGravityFieldPriority() const { return GravityFieldPriority; }
-	float GetGravityInfluenceRange() const { return GravityInfluenceRange; }
+	FORCEINLINE float GetGravityStrength() const { return GravityStrength; }
+	FORCEINLINE int32 GetGravityFieldPriority() const { return GravityFieldPriority; }
+	FORCEINLINE float GetGravityInfluenceRange() const { return GravityInfluenceRange; }
 
 	float GetTotalGravityRadius() const;
 
 	// Setters
-	void SetGravityStrength(float NewGravityStrength) { GravityStrength = NewGravityStrength; }
-	void SetGravityFieldPriority(int32 NewGravityFieldPriority) { GravityFieldPriority = NewGravityFieldPriority; }
-	void SetGravityInfluenceRange(float NewGravityRadius) { GravityInfluenceRange = NewGravityRadius; }
+	FORCEINLINE void SetGravityStrength(float NewGravityStrength) { GravityStrength = NewGravityStrength; }
+	FORCEINLINE void SetGravityFieldPriority(int32 NewGravityFieldPriority) { GravityFieldPriority = NewGravityFieldPriority; }
+	FORCEINLINE void SetGravityInfluenceRange(float NewGravityRadius) { GravityInfluenceRange = NewGravityRadius; }
 
 	void RedrawDebugField();
 	void UpdateFieldDimensions();
@@ -39,7 +44,14 @@ public:
 	UFUNCTION()
 	void OnGravityVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	bool IsActorInGravityField(AActor* Actor) const;
+	FORCEINLINE bool IsActorInGravityField(AActor* Actor) const
+	{
+		if (GravityVolume && Actor)
+		{
+			return GravityVolume->IsOverlappingActor(Actor);
+		}
+		return false;
+	}
 	
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bShowDebugField = true;
