@@ -265,7 +265,7 @@ void AMGG_Mario::PhysicProcess(float DeltaTime)
 	// End point (forward direction * distance)
 	FVector Direction = GravityVector;
 	Direction.Normalize();
-	FVector PointArrivee = PointDepart + (Direction * 61.0f);
+	FVector PointArrivee = PointDepart + (Direction * 120.0f);
 
 	// Raycast configuration
 	FHitResult ResultatHit;
