@@ -2,11 +2,33 @@
 #include "Components/LineBatchComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+/**
+ * @brief Constructor for the gravity field drawer.
+ *
+ * @details Initializes the drawer with a reference to the debug line component
+ * that will be used for rendering visualization elements.
+ *
+ * @param InDebugLines The line batch component to use for debug drawing.
+ */
 GravityFieldDrawer::GravityFieldDrawer(ULineBatchComponent* InDebugLines) : DebugLines(InDebugLines)
 {
 	
 }
 
+/**
+ * @brief Draws a sphere shape for debug visualization.
+ *
+ * @details Creates a wireframe representation of a sphere by drawing multiple
+ * circular cross-sections and longitude lines. The implementation:
+ * 1. Draws latitude circles at different heights along the sphere
+ * 2. Draws longitude lines from pole to pole
+ * 3. Uses the specified segments count to determine resolution
+ *
+ * @param Center The center position of the sphere.
+ * @param Radius The radius of the sphere.
+ * @param Segments The number of segments to use for the sphere (higher = smoother).
+ * @param Color The color to use for drawing the sphere.
+ */
 void GravityFieldDrawer::DrawSphere(const FVector& Center, float Radius, int32 Segments, const FColor& Color)
 {
     const int32 NumLatitudes = 5;
@@ -68,6 +90,20 @@ void GravityFieldDrawer::DrawSphere(const FVector& Center, float Radius, int32 S
     }
 }
 
+/**
+ * @brief Draws a cube shape for debug visualization.
+ *
+ * @details Creates a wireframe representation of a cube by drawing 12 lines
+ * connecting the 8 corners of the cube. The implementation:
+ * 1. Calculates the 8 corner points based on center, extent and rotation
+ * 2. Draws lines for the front face, back face, and connections between them
+ * 3. Applies the specified rotation to orient the cube correctly
+ *
+ * @param Center The center position of the cube.
+ * @param Extent The extent (half-dimensions) of the cube.
+ * @param Rotation The rotation of the cube.
+ * @param Color The color to use for drawing the cube.
+ */
 void GravityFieldDrawer::DrawCube(const FVector& Center, const FVector& Extent, const FRotator& Rotation, const FColor& Color)
 {
 	const FVector Forward = Rotation.Vector();
@@ -105,6 +141,21 @@ void GravityFieldDrawer::DrawCube(const FVector& Center, const FVector& Extent, 
 	DrawLine(Points[3], Points[7], Color);
 }
 
+/**
+ * @brief Draws a torus shape for debug visualization.
+ *
+ * @details Creates a wireframe representation of a torus by drawing circles
+ * along the main ring. The implementation:
+ * 1. Draws concentric circles around the torus's main ring
+ * 2. Draws connecting lines between points on adjacent circles
+ * 3. Uses the specified segments count to determine resolution
+ *
+ * @param Center The center position of the torus.
+ * @param TorusRadius The main radius of the torus (distance from center to ring center).
+ * @param TubeRadius The tube radius of the torus (thickness of the ring).
+ * @param Segments The number of segments to use for the torus (higher = smoother).
+ * @param Color The color to use for drawing the torus.
+ */
 void GravityFieldDrawer::DrawTorus(const FVector& Center, float TorusRadius, float TubeRadius, int32 Segments, const FColor& Color)
 {
     const int32 MainSegments = 16;
@@ -146,6 +197,22 @@ void GravityFieldDrawer::DrawTorus(const FVector& Center, float TorusRadius, flo
     }
 }
 
+/**
+ * @brief Draws a plane shape for debug visualization.
+ *
+ * @details Creates a wireframe representation of a plane with a volume above it. The implementation:
+ * 1. Draws a grid of lines on the base plane to represent its surface
+ * 2. Draws vertical lines from the corners of the base to the top plane
+ * 3. Draws the top plane outline to form a complete volume
+ * 4. Adds a normal vector indicator to show the plane's orientation
+ *
+ * @param Center The center position of the plane.
+ * @param Normal The normal vector of the plane.
+ * @param Rotation The rotation of the plane.
+ * @param Size The width/length of the plane.
+ * @param Height The height of the volume above the plane.
+ * @param Color The color to use for drawing the plane.
+ */
 void GravityFieldDrawer::DrawPlane(const FVector& Center, const FVector& Normal, const FRotator& Rotation, float Size, float Height, const FColor& Color)
 {
 	FRotationMatrix RotationMatrix(Rotation);

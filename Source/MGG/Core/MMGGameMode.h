@@ -10,5 +10,6 @@ class MGG_API AMMGGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	//////// CONSTRUCTOR ////////
 	AMMGGameMode();
 };

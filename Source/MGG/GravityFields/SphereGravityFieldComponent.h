@@ -10,13 +10,23 @@ class MGG_API USphereGravityFieldComponent : public UBaseGravityFieldComponent
 	GENERATED_BODY()
 
 public:
+	//////// CONSTRUCTOR ////////
 	USphereGravityFieldComponent();
+
+	//////// METHODS ////////
+	//// Gravity field methods
 	virtual void UpdateGravityVolume() override;
 
 protected:
+	//////// METHODS ////////
+	//// Debug methods
 	virtual void DrawDebugGravityField() override;
+
+	//// Gravity field methods
 	virtual FVector CalculateGravityVector(const FVector& TargetLocation) const override;
 	virtual FGravityFieldDimensions CalculateFieldDimensions() const override;
 
+	//////// INLINE METHODS ////////
+	//// Gravity state methods
 	FORCEINLINE virtual bool RequiresConstantGravityUpdate() const override { return true; } 
 };

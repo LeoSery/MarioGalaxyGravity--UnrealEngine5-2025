@@ -1,5 +1,14 @@
 ﻿#include "TorusMeshComponent.h"
 
+/**
+ * @brief Constructor for the torus mesh component.
+ *
+ * @details Initializes the procedural mesh component with default settings
+ * for collision, rendering, and material assignment. Sets up the component
+ * to generate physics collision data automatically from the mesh geometry.
+ *
+ * @param ObjectInitializer The initializer for this UObject.
+ */
 UTorusMeshComponent::UTorusMeshComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -14,12 +23,27 @@ UTorusMeshComponent::UTorusMeshComponent(const FObjectInitializer& ObjectInitial
 	SetVisibility(true);
 }
 
+/**
+ * @brief Called when the component is registered with the scene.
+ *
+ * @details Ensures the torus mesh is generated immediately when the component
+ * is added to the scene, making the visual representation available from the start.
+ */
 void UTorusMeshComponent::OnRegister()
 {
 	Super::OnRegister();
 	GenerateTorusMesh();
 }
 
+/**
+ * @brief Called when a property of the component is changed in the editor.
+ *
+ * @details Regenerates the torus mesh whenever one of its defining properties
+ * (radius, thickness, segment count) is modified in the editor. This provides
+ * immediate visual feedback during the level design process.
+ *
+ * @param PropertyChangedEvent Information about the property that was changed.
+ */
 void UTorusMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -35,6 +59,26 @@ void UTorusMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& Property
 	}
 }
 
+/**
+ * @brief Generates the procedural torus mesh geometry.
+ *
+ * @details Creates a complete 3D torus mesh by:
+ * 1. Generating vertices in a torus pattern based on TorusRadius and TubeRadius
+ * 2. Creating triangles to connect these vertices into a continuous surface
+ * 3. Calculating normal vectors for proper lighting
+ * 4. Generating UV coordinates for texture mapping
+ * 5. Creating a mesh section from these components
+ * 6. Applying a default material if none is assigned
+ * 
+ * The process uses parametric equations to place vertices in a torus pattern:
+ * - The main ring follows a circle of radius TorusRadius
+ * - At each point on this ring, a circle of radius TubeRadius is created
+ * - TorusSegments controls the resolution around the main ring
+ * - TubeSegments controls the resolution around the tube cross-section
+ * 
+ * This procedural approach allows for runtime creation and modification of
+ * torus planets with variable dimensions without requiring pre-made assets.
+ */
 void UTorusMeshComponent::GenerateTorusMesh()
 {
     TArray<FVector> Vertices;
