@@ -215,26 +215,26 @@ void AMGG_Mario::PhysicProcess(float DeltaTime)
 ### Installation
 
 1. Clone the Git repository or download the source files
-2. Open the project in Unreal Engine 5 (version 5.1 or higher recommended)
+2. Open the project in Unreal Engine 5 (version 5.4 or higher recommended)
 3. Open the "Main" map in the "Maps" folder
 
-### Placing planets in the editor
-
-1. In the "Place Actors" panel, search for available planet types (SpherePlanet, CubePlanet, etc.)
-   ![Place Actors Panel](./ReadmeContent/DemoScreenshots/MGG_PlaceActors.png)
-2. Drag and drop the planet into the scene
-3. Select the planet and configure its properties in the "Details" panel
-   ![Planet Configuration](./ReadmeContent/DemoScreenshots/MGG_PlanetConfig.png)
-
-### Configuring gravity parameters
+### Configuring Planet parameters
 
 Each planet has several adjustable parameters:
+
 - **Planet Radius**: Size of the planet
 - **Gravity Strength**: Force of gravity
 - **Field Priority**: Priority of the field (useful when multiple fields overlap)
 - **Gravity Influence Range**: Range of the gravity field beyond the surface
 
-![Gravity Settings](./ReadmeContent/DemoScreenshots/MGG_GravitySettings.png)
+Some planets that have custom shapes, such as the procedurally generated 'Torus' planet, have specific additional parameters that are linked to their mesh:
+
+- **Torus Radius** : Distance from the center of the torus to the center of the tube (main radius)
+- **Tube Radius** : Thickness/radius of the tube that forms the ring
+- **Torus segments** : Number of segments around the main circle (higher values create a smoother circle)
+- **Tube segments** : Number of segments around the tube's circumference (higher values create a smoother tube surface)
+
+![Gravity Settings](./ReadmeContent/TechnicalDemoGifs/MGGPlanetDemo.gif)
 
 ## Creating a new planet
 
